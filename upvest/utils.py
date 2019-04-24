@@ -4,6 +4,32 @@ import requests
 from upvest.config import API_VERSION
 from upvest.config import BASE_URL
 
+class ResultObj(result, **req_params):
+    def __init__(self):
+        self.status_code = result.status_code
+        try:
+            self.json = result.json()
+        except:
+            #raise ValueError
+            pass
+
+    def data(self):
+        try:
+            self.data = json.loads(self.json())['results']
+        except:
+            self.data = json.loads(self.json())
+        return self.data
+
+    def previous(self,**req_params):
+        link = json.loads(self.json())['previous']
+        return ResultObj(Request().get(link,**req_params))
+
+    def next(self,**req_params):
+        link = json.loads(self.json())['next']
+        return ResultObj(Request().get(link,**req_params))
+
+        
+
 class Request(object):
     def __init__(self):
         pass
