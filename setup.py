@@ -40,7 +40,7 @@ setuptools.setup(
     # license='licence',
     long_description=_README,
     long_description_content_type="text/markdown",
-    url="https://github.com/toknapp/python-api-client/",
+    url="https://github.com/toknapp/python-sdk-upvest/",
     packages=_PACKAGES,
     include_package_data=True,
     classifiers=_CLASSIFIERS,

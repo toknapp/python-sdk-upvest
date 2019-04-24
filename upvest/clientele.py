@@ -10,10 +10,10 @@ class UpvestClienteleAPI(object):
         # Create request instance providing access credentials
         self.auth_instance = OAuth(client_id=client_id, client_secret=client_secret, username=username, password=password)
         
-    def _tx_speed_to_fee(self, speed, asset_id):
-        path = '/price/'
-        r = Request().get(auth_instance=self.auth_instance, path=path + asset_id)
-        return json.loads(r)['speed']
+    # def _tx_speed_to_fee(self, speed, asset_id):
+    #     path = '/price/'
+    #     r = Request().get(auth_instance=self.auth_instance, path=path + asset_id)
+    #     return json.loads(r)['speed']
 
     def list_assets(self):
         path = '/assets/'
