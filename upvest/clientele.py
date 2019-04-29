@@ -55,7 +55,6 @@ class UpvestClienteleAPI(object):
             'recipient' : recipient,
         }
         response = Request().post(auth_instance=self.auth_instance, path=path, body=body)
-        print(response.text)
         return response
 
     def list_transaction(self, txhash):
