@@ -18,7 +18,7 @@ def test_list_wallets():
     response = oauth_instance.list_wallets()
     assert response.status_code == 200
 
-    id = response.data()[0]['id']
+    id = response.data[0]['id']
     response = oauth_instance.list_wallet(id)
     assert response.status_code == 200
 
@@ -35,7 +35,7 @@ def test_send_transaction():
     """Tests an API call to send transactions"""
     user = create_user()
     oauth_instance = create_oauth_client(user['username'], user['password'])
-    wallet_id = oauth_instance.create_wallet('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f').data()['id']
+    wallet_id = oauth_instance.create_wallet('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f').data['id']
     response = oauth_instance.send_transaction(
         wallet_id, 
         'deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f', 
@@ -44,7 +44,7 @@ def test_send_transaction():
         '0x6720d291a72b8673e774a179434c96d21eb85e71'
     )
     assert response.status_code == 201
-    assert response.data()['txhash'] is not None
+    assert response.data['txhash'] is not None
 
 
 # def test_list_transaction():

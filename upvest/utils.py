@@ -7,20 +7,17 @@ from upvest.config import BASE_URL
 class Response(object):
     def __init__(self, result, **req_params):
         self.status_code = result.status_code
-        self.response_data = None
         self.req_params = req_params
+        self.raw = result
         try:
             self.json = result.json()
+            try:
+                self.data = self.json['results']
+            except:
+                self.data = self.json
         except:
             #raise ValueError
-            pass
-
-    def data(self):
-        try:
-            self.response_data = self.json['results']
-        except:
-            self.response_data = self.json
-        return self.response_data
+            self.data = None
 
     def previous(self,**req_params):
         link = self.json['previous']
