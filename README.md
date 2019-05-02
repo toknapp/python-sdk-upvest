@@ -79,7 +79,7 @@ tenancy.list_users()
 ```python
 tenancy.change_password('username', 'current_password', 'new_password')
 ```
-#### Deregister a user
+#### Change password of a user
 ```python
 tenancy.deregister_user('username')
 ```
@@ -106,9 +106,8 @@ clientele.list_wallet('wallet_id')
 clientele.send_transaction('wallet_id', 'asset_id', 'quantity', 'fee', 'recipient')
 ```
 
-Usage
+Tutorial
 ------
-## Tutorial
 ### Tenant Creation
 The business "Successful blockchain project", founded by John Doe, would like to built a platform for Ethereum wallets with easy access and wallet management. Therefore, John visits the [Upvest Signup Page](https://login.upvest.co/sign-up), creates and account, and retrieves his API keys from the account management page. He is now able to create the API keys Authentication Object:
 ```python
@@ -156,5 +155,4 @@ tx_hash = transaction["txhash"]
 ```
 
 That's it! Jane has successfully sent a transaction and is able to monitor it via [Etherscan](https://etherscan.io).
-
 

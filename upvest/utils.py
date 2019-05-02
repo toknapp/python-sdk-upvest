@@ -1,5 +1,6 @@
 import json
 import requests
+import re
 
 from upvest.config import API_VERSION
 from upvest.config import BASE_URL
@@ -7,20 +8,17 @@ from upvest.config import BASE_URL
 class Response(object):
     def __init__(self, result, **req_params):
         self.status_code = result.status_code
-        self.response_data = None
         self.req_params = req_params
+        self.raw = result
         try:
             self.json = result.json()
+            try:
+                self.data = self.json['results']
+            except:
+                self.data = self.json
         except:
             #raise ValueError
-            pass
-
-    def data(self):
-        try:
-            self.response_data = self.json['results']
-        except:
-            self.response_data = self.json
-        return self.response_data
+            self.data = None
 
     def previous(self,**req_params):
         link = self.json['previous']
@@ -39,9 +37,13 @@ class Request(object):
 
     def _request(self, **req_params):
         # Set request parameters
+        regex = re.compile('\\')
         body = req_params.get('body', None)
         path = req_params.get('path')
         method = req_params.get('method')
+        for key in body.keys():
+            if (regex.search(body['key'].encode('ascii')) != None):
+                raise Exception('forbidden characters are present')
         # Instantiate the respectively needed auth instance
         auth_instance = req_params.get('auth_instance')
         authenticated_headers = auth_instance.get_headers(**req_params)
