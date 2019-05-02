@@ -1,4 +1,3 @@
-import json
 import uuid
 
 from tests.partials.client_instance import create_tenancy_client
@@ -11,14 +10,14 @@ def test_register_user():
     unique_id = uuid.uuid4()
     response = tenancy_instance.register_user(f'upvest_test_{unique_id}','secret')
     assert response.status_code == 201
-    assert response.json()['username'] == f'upvest_test_{unique_id}'
+    assert response.data()['username'] == f'upvest_test_{unique_id}'
 
 def test_list_user():
     """Tests an API call to get a specific user"""
     user = create_user()
     response = tenancy_instance.list_user(user['username'])
     assert response.status_code == 200
-    assert response.json()['username'] == user['username']
+    assert response.data()['username'] == user['username']
 
 def test_list_users():
     """Tests an API call to get a list of usersr"""

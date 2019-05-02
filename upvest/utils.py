@@ -8,7 +8,7 @@ class Response(object):
     def __init__(self, result, **req_params):
         self.status_code = result.status_code
         self.response_data = None
-        self.req_params = **req_params
+        self.req_params = req_params
         try:
             self.json = result.json()
         except:
@@ -17,20 +17,20 @@ class Response(object):
 
     def data(self):
         try:
-            self.response_data = json.loads(self.json())['results']
+            self.response_data = self.json['results']
         except:
-            self.response_data = json.loads(self.json())
+            self.response_data = self.json
         return self.response_data
 
     def previous(self,**req_params):
-        link = json.loads(self.json())['previous']
+        link = self.json['previous']
         self.req_params['path'] = link.split(link, API_VERSION)[-1]
-        return Response(Request().get(self.req_params))
+        return Response(Request().get(**self.req_params))
 
     def next(self,**req_params):
-        link = json.loads(self.json())['next']
+        link = self.json()['next']
         self.req_params['path'] = link.split(link, API_VERSION)[-1]
-        return Response(Request().get(self.req_params))
+        return Response(Request().get(**self.req_params))
 
 
 class Request(object):
@@ -39,11 +39,11 @@ class Request(object):
 
     def _request(self, **req_params):
         # Set request parameters
-        body = **req_params.get('body', None)
-        path = **req_params.get('path')
-        method = **req_params.get('method')
+        body = req_params.get('body', None)
+        path = req_params.get('path')
+        method = req_params.get('method')
         # Instantiate the respectively needed auth instance
-        auth_instance = **req_params.get('auth_instance')
+        auth_instance = req_params.get('auth_instance')
         authenticated_headers = auth_instance.get_headers(**req_params)
         # Execute request with authenticated headers
         request_url = BASE_URL + API_VERSION + path
