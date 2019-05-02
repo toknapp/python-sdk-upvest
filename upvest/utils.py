@@ -45,7 +45,7 @@ class Request(object):
         path = req_params.get('path')
         method = req_params.get('method')
         for key in body.keys():
-            if (regex.search(body['key']) != None):
+            if (regex.search(body['key'].encode('ascii')) != None):
                 raise Exception('forbidden characters are present')
         # Instantiate the respectively needed auth instance
         auth_instance = req_params.get('auth_instance')
