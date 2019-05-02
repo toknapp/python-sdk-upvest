@@ -4,9 +4,11 @@ import requests
 from upvest.config import API_VERSION
 from upvest.config import BASE_URL
 
-class ResultObj(result, **req_params):
-    def __init__(self):
+class Response(object):
+    def __init__(self, result, **req_params):
         self.status_code = result.status_code
+        self.response_data = None
+        self.req_params = req_params
         try:
             self.json = result.json()
         except:
@@ -15,20 +17,21 @@ class ResultObj(result, **req_params):
 
     def data(self):
         try:
-            self.data = json.loads(self.json())['results']
+            self.response_data = self.json['results']
         except:
-            self.data = json.loads(self.json())
-        return self.data
+            self.response_data = self.json
+        return self.response_data
 
     def previous(self,**req_params):
-        link = json.loads(self.json())['previous']
-        return ResultObj(Request().get(link,**req_params))
+        link = self.json['previous']
+        self.req_params['path'] = link.split(link, API_VERSION)[-1]
+        return Response(Request().get(**self.req_params))
 
     def next(self,**req_params):
-        link = json.loads(self.json())['next']
-        return ResultObj(Request().get(link,**req_params))
+        link = self.json()['next']
+        self.req_params['path'] = link.split(link, API_VERSION)[-1]
+        return Response(Request().get(**self.req_params))
 
-        
 
 class Request(object):
     def __init__(self):
@@ -44,8 +47,8 @@ class Request(object):
         authenticated_headers = auth_instance.get_headers(**req_params)
         # Execute request with authenticated headers
         request_url = BASE_URL + API_VERSION + path
-        return requests.request(method, request_url, json=body, headers=authenticated_headers) 
-        
+        return Response(requests.request(method, request_url, json=body, headers=authenticated_headers), **req_params)
+
     def post(self, **req_params):
         req_params['method'] = 'POST'
         return self._request(**req_params)

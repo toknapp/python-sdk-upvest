@@ -9,6 +9,6 @@ def create_user():
     tenancy_instance = create_tenancy_client()
     response = tenancy_instance.register_user(username, password)
     return {
-        'username': response.json()['username'],
+        'username': response.data()['username'],
         'password': password
     }

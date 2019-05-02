@@ -13,7 +13,6 @@ def create_tenancy_client():
     API_PASSPHRASE = env.str('API_PASSPHRASE')
     return UpvestTenancyAPI(API_KEY, API_SECRET, API_PASSPHRASE)
 
-
 def create_oauth_client(username, password):
     CLIENT_SECRET = env.str('CLIENT_SECRET')
     CLIENT_ID = env.str('CLIENT_ID')
