@@ -1,5 +1,6 @@
 import json
 import requests
+import re
 
 from upvest.config import API_VERSION
 from upvest.config import BASE_URL
@@ -39,9 +40,13 @@ class Request(object):
 
     def _request(self, **req_params):
         # Set request parameters
+        regex = re.compile('\\')
         body = req_params.get('body', None)
         path = req_params.get('path')
         method = req_params.get('method')
+        for key in body.keys():
+            if (regex.search(body['key']) != None):
+                raise Exception('forbidden characters are present')
         # Instantiate the respectively needed auth instance
         auth_instance = req_params.get('auth_instance')
         authenticated_headers = auth_instance.get_headers(**req_params)
