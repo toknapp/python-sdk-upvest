@@ -42,7 +42,7 @@ tenancy.list_users()
 ```python
 tenancy.change_password('username', 'current_password', 'new_password')
 ```
-####Change password of a user
+#### Change password of a user
 ```python
 tenancy.deregister_user('username')
 ```
