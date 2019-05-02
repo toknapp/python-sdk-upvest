@@ -9,11 +9,6 @@ class UpvestClienteleAPI(object):
     def __init__(self, client_id, client_secret, username, password):
         # Create request instance providing access credentials
         self.auth_instance = OAuth(client_id=client_id, client_secret=client_secret, username=username, password=password)
-        
-    # def _tx_speed_to_fee(self, speed, asset_id):
-    #     path = '/price/'
-    #     r = Request().get(auth_instance=self.auth_instance, path=path + asset_id)
-    #     return json.loads(r)['speed']
 
     def list_assets(self):
         path = '/assets/'
@@ -44,7 +39,6 @@ class UpvestClienteleAPI(object):
         # Define tx endpoint
         path = '/tx/'
 
-        # fee = self._tx_speed_to_fee(speed, asset_id)
         # Provide password and asset_id for wallet creation
         body = {
             'password' : self.auth_instance.password,
