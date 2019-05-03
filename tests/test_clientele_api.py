@@ -7,19 +7,19 @@ def test_create_wallet():
     """Tests an API call to create a wallet"""
     user = create_user()
     oauth_instance = create_oauth_client(user['username'],user['password'])
-    response = oauth_instance.create_wallet('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f')
+    response = oauth_instance.wallet.create('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f')
     assert response.status_code == 201
 
 def test_list_wallets():
     """Tests an API call to list wallets"""
     user = create_user()
     oauth_instance = create_oauth_client(user['username'], user['password'])
-    oauth_instance.create_wallet('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f')
-    response = oauth_instance.list_wallets()
+    oauth_instance.wallet.create('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f')
+    response = oauth_instance.wallet.list()
     assert response.status_code == 200
 
     id = response.data[0]['id']
-    response = oauth_instance.list_wallet(id)
+    response = oauth_instance.wallet.retrieve(id)
     assert response.status_code == 200
 
 
@@ -27,7 +27,7 @@ def test_list_assets():
     """Tests an API call to list assets"""
     user = create_user()
     oauth_instance = create_oauth_client(user['username'], user['password'])
-    response = oauth_instance.list_assets() 
+    response = oauth_instance.asset.list() 
     assert response.status_code == 200
 
 
@@ -35,8 +35,8 @@ def test_send_transaction():
     """Tests an API call to send transactions"""
     user = create_user()
     oauth_instance = create_oauth_client(user['username'], user['password'])
-    wallet_id = oauth_instance.create_wallet('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f').data['id']
-    response = oauth_instance.send_transaction(
+    wallet_id = oauth_instance.wallet.create('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f').data['id']
+    response = oauth_instance.transaction.send(
         wallet_id, 
         'deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f', 
         '10000000000000000', 

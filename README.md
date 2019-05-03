@@ -41,69 +41,75 @@ Either you retrieve the actual API response object provided by the Upvest API:
 ```python
 # Retrieve raw response obejct
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-raw_response = clientele.list_wallets().raw
+raw_response = clientele.wallet.list().raw
 ```
 Or you decide to retrieve only the relevant data from the response as a python dict:
 ```python
 # Retrieve response data
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-data_response = clientele.list_wallets().data
+data_response = clientele.wallet.list().data
 ```
 The ResponseObject provides a convienient option for pagination. The Upvest API result arrays are limited to an item count of 10 per page, iteratable via the endpoints provided in the response with the ```next``` and ```previous``` keys. In order to use pagination with the Upvest Python library, simply write:
 ```python
 # Previous Page
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-response = clientele.list_wallets().previous()
+response = clientele.wallet.list()
+previous_array = response.previous()
 
 # Next Page
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-response = clientele.list_wallets().next()
+response = clientele.wallet.list()
+next_array = response.next()
 ```
 
 Usage
 ------
 ### Tenancy
-#### Create a user
+#### User Endpoint
+##### Create a user
 ```python
-tenancy.register_user('username','password')
+tenancy.user.create('username','password')
 ```
-#### List a user
+##### List a user
 ```python
-tenancy.list_user('username')
+tenancy.user.retrieve('username')
 ```
-#### List all users under tenancy
+##### List all users under tenancy
 ```python
-tenancy.list_users()
+tenancy.user.list()
 ```
-#### Change password of a user
+##### Change password of a user
 ```python
-tenancy.change_password('username', 'current_password', 'new_password')
+tenancy.user.update('username', 'current_password', 'new_password')
 ```
-#### Deregister a user
+##### Deregister a user
 ```python
-tenancy.deregister_user('username')
+tenancy.user.delete('username')
 ```
 
 ### Clientele
-#### List available assets
+#### Assets
+##### List available assets
 ```python
-clientele.list_assets()
+clientele.asset.list()
 ```
-#### Create a wallet for a user
+#### Wallets
+##### Create a wallet for a user
 ```python
-clientele.create_wallet('asset_id')
+clientele.wallet.create('asset_id')
 ```
-#### List all wallets for a user
+##### List all wallets for a user
 ```python
-clientele.list_wallets()
+clientele.wallet.list()
 ```
-#### List specific wallet for a user
+##### List specific wallet for a user
 ```python
-clientele.list_wallet('wallet_id')
+clientele.wallet.retrieve('wallet_id')
 ```
-#### Send transaction
+#### Transactions
+##### Send transaction
 ```python
-clientele.send_transaction('wallet_id', 'asset_id', 'quantity', 'fee', 'recipient')
+clientele.transaction.send('wallet_id', 'asset_id', 'quantity', 'fee', 'recipient')
 ```
 
 Usage
@@ -122,7 +128,7 @@ John sets up his platform and soon has the first person signing up for his servi
 ```python
 import json
 
-response = tenancy.register_user('Jane Apple','very secret').raw
+response = tenancy.user.create('Jane Apple','very secret').raw
 recovery_kit = response.json()["recoverykit"]
 ```
 After parsing it to JSON, John can extract the recovery kit with `response["recoverykit"]` and pass it on to Jane
@@ -134,7 +140,7 @@ from upvest.tenancy import UpvestClienteleAPI
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
 
 # Listing assets and their ids
-asset_id = clientele.list_assets().data[i]["id"]
+asset_id = clientele.asset.list().data[i]["id"]
 
 # Creating a wallet for Jane on Ethereum
 ethereum_wallet = clientele.create_wallet(asset_id).data
@@ -146,12 +152,12 @@ Using the address, Jane is now able to receive funds in her Ethereum wallet on J
 After a couple of days, Jane would like to buy a new road bike, paying with Ethereum. The address of the seller is: `0x6720d291A72B8673E774A179434C96D21eb85E71` and Jane would like to transfer 1ETH. As quantity is denoted in Wei (Ethereum smallest unit), John will need to implement an automatic transformation of this amount. The transaction can be sent via the Upvest API making the following call:
 ```python
 # Retrieving Jane's wallet_id
-wallets_of_jane = clientele.list_wallets().data
+wallets_of_jane = clientele.wallet.list().data
 id_wallet = wallets_of_jane[i]["id"]
 recipient = '0x6720d291A72B8673E774A179434C96D21eb85E71'
 
 # Sending the transaction
-transaction = clientele.send_transaction('id_wallet', 'asset_id', '1000000000000000000', '4000000000', 'recipient').data
+transaction = clientele.transaction.send('id_wallet', 'asset_id', '1000000000000000000', '4000000000', 'recipient').data
 tx_hash = transaction["txhash"]
 ```
 
