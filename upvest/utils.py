@@ -74,10 +74,28 @@ class Request(object):
         return self._request(**req_params)
 
 class User(object):
+    def __init__(self, auth_instance, username):
+        self.path = '/tenancy/users/'
+        self.auth_instance = auth_instance
+        self.username = username
+
+    def update(self, current_password, new_password):
+        # Provide current and new password
+        body = {
+            'old_password': current_password,
+            'new_password': new_password,
+        }
+        return Request().patch(auth_instance=self.auth_instance, path=self.path + self.username, body=body)
+
+    def delete(self):
+        # Deregister a user
+        return Request().delete(auth_instance=self.auth_instance, path=self.path + self.username)
+
+class Users(object):
     def __init__(self, auth_instance):
         self.path = '/tenancy/users/'
         self.auth_instance = auth_instance
-
+    
     def create(self, username, password):
         # Set username and password for the user
         body = {
@@ -85,27 +103,15 @@ class User(object):
             'password': password,
         }
         return Request().post(auth_instance=self.auth_instance, path=self.path, body=body)
-
-    def retrieve(self, username):
-        # Retrieve single user
-        return Request().get(auth_instance=self.auth_instance, path=self.path + username)
-
-    def list(self):
+    
+    def get(self, username):
+        response = Request().get(auth_instance=self.auth_instance, path=self.path + username)
+        username = response.data['username']
+        return User(self.auth_instance, username)
+    
+    def all(self):
         # Retrieve user list
         return Request().get(auth_instance=self.auth_instance, path=self.path, response_instance=PaginatedResponse)
-
-    def update(self, username, current_password, new_password):
-        # Provide current and new password
-        body = {
-            'old_password': current_password,
-            'new_password': new_password,
-        }
-        return Request().patch(auth_instance=self.auth_instance, path=self.path + username, body=body)
-
-    def delete(self, username):
-        # Deregister a user
-        return Request().delete(auth_instance=self.auth_instance, path=self.path + username)
-
 
 class Asset(object):
     def __init__(self, auth_instance):
