@@ -5,6 +5,7 @@ import re
 from upvest.config import API_VERSION
 from upvest.config import BASE_URL
 
+
 class Response(object):
     def __init__(self, result, **req_params):
         self.status_code = result.status_code
@@ -37,13 +38,15 @@ class Request(object):
 
     def _request(self, **req_params):
         # Set request parameters
-        regex = re.compile('\\')
         body = req_params.get('body', None)
         path = req_params.get('path')
         method = req_params.get('method')
-        for key in body.keys():
-            if (regex.search(body['key'].encode('ascii')) != None):
-                raise Exception('forbidden characters are present')
+        if body is not None:
+            for value in body.values():
+                try:
+                    value.encode('ascii')
+                except UnicodeEncodeError:
+                    raise Exception('Forbidden characters present, please remove')
         # Instantiate the respectively needed auth instance
         auth_instance = req_params.get('auth_instance')
         authenticated_headers = auth_instance.get_headers(**req_params)

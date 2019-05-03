@@ -11,7 +11,7 @@ In order to retrieve your API credentials for using this Python client, you'll n
 
 ### API Keys Authentication
 The authentication via API keys and secret allows you to perform all tenant related operations.
-Create an API keypair within the dashboard.
+Create an API key pair within the dashboard.
 
 Next, create an UpvestTenancyAPI object in order to authenticate your API calls:
 ```python
@@ -31,12 +31,12 @@ clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
 ```
 
 ### API Calls
-All tenancy related operations must be using the API Keys authentication, whereas all actions on a user's behalf need to be authenticated via OAuth. The API calls are built along those two authentication objects.
+All tenancy related operations must be using the API Keys authentication, whereas all actions on a user's behalf need to be authenticated via OAuth. The API calls are built along with those two authentication objects.
 
-The methods allow for passing paramenters if needed. If required arguments are not provided, the respective error will be raised.
+The methods allow for passing parameters if needed. If the required arguments are not provided, the respective error will be raised.
 
 #### Response Object
-All API calls return a ResponseObject. For your convenience we implemented two ways of reading data from this Object. Both the raw response, as well as the response data dict, are accessible via the ResponseObject's attributes.
+All API calls return a ResponseObject. For your convenience, we implemented two ways of reading data from this Object. Both the raw response, as well as the response data dict, are accessible via the ResponseObject's attributes.
 Either you retrieve the actual API response object provided by the Upvest API:
 ```python
 # Retrieve raw response obejct
@@ -79,7 +79,7 @@ tenancy.list_users()
 ```python
 tenancy.change_password('username', 'current_password', 'new_password')
 ```
-#### Change password of a user
+#### Deregister a user
 ```python
 tenancy.deregister_user('username')
 ```
@@ -106,10 +106,11 @@ clientele.list_wallet('wallet_id')
 clientele.send_transaction('wallet_id', 'asset_id', 'quantity', 'fee', 'recipient')
 ```
 
-Tutorial
+Usage
 ------
+## Tutorial
 ### Tenant Creation
-The business "Successful blockchain project", founded by John Doe, would like to built a platform for Ethereum wallets with easy access and wallet management. Therefore, John visits the [Upvest Signup Page](https://login.upvest.co/sign-up), creates and account, and retrieves his API keys from the account management page. He is now able to create the API keys Authentication Object:
+The business "Successful blockchain project", founded by John Doe, would like to build a platform for Ethereum wallets with easy access and wallet management. Therefore, John visits the [Upvest Signup Page](https://login.upvest.co/sign-up), creates an account, and retrieves his API keys from the account management page. He is now able to create the API keys Authentication Object:
 ```python
 # API Keys Object
 from upvest.tenancy import UpvestTenancyAPI
@@ -127,7 +128,7 @@ recovery_kit = response.json()["recoverykit"]
 After parsing it to JSON, John can extract the recovery kit with `response["recoverykit"]` and pass it on to Jane
 
 ### Wallet Creation
-After creating an account Jane wants to create an Ethereum wallet. In order to do that on behalf of Jane, John needs to initialize an OAuth Object with his client credentials and Jane's username and password. After doing so John can easily create a wallet by providing the respective `asset_id` for Ethereum to the `create_wallet()` function. The asset ids can be retrieved via a call to the upvest asset endpoint, using the clientele authentication:
+After creating an account Jane wants to create an Ethereum wallet. In order to do that on behalf of Jane, John needs to initialize an OAuth Object with his client credentials and Jane's username and password. After doing so John can easily create a wallet by providing the respective `asset_id` for Ethereum to the `create_wallet()` function. The asset ids can be retrieved via a call to the Upvest asset endpoint, using the clientele authentication:
 ```python
 from upvest.tenancy import UpvestClienteleAPI
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
@@ -142,7 +143,7 @@ wallet_address = ethereum_wallet['address']
 Using the address, Jane is now able to receive funds in her Ethereum wallet on John's platform. Thus, she logs in to her current wallet provider and sends the funds to her newly created wallet.
 
 ### Transaction Sending
-After a couple of days Jane would like to buy a new roadbike, paying with Ethereum. The address of the seller is: `0x6720d291A72B8673E774A179434C96D21eb85E71` and Jane would like to transfer 1ETH. As quantity is denoted in Wei (Ethereum smallest unit), John will need to implement an automatic transformation of this amount. The transaction can be send via the Upvest API making the following call:
+After a couple of days, Jane would like to buy a new road bike, paying with Ethereum. The address of the seller is: `0x6720d291A72B8673E774A179434C96D21eb85E71` and Jane would like to transfer 1ETH. As quantity is denoted in Wei (Ethereum smallest unit), John will need to implement an automatic transformation of this amount. The transaction can be sent via the Upvest API making the following call:
 ```python
 # Retrieving Jane's wallet_id
 wallets_of_jane = clientele.list_wallets().data
@@ -155,4 +156,5 @@ tx_hash = transaction["txhash"]
 ```
 
 That's it! Jane has successfully sent a transaction and is able to monitor it via [Etherscan](https://etherscan.io).
+
 
