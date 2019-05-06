@@ -36,31 +36,34 @@ All tenancy related operations must be using the API Keys authentication, wherea
 The methods allow for passing parameters if needed. If the required arguments are not provided, the respective error will be raised.
 
 #### Response Object
-All API calls return a ResponseObject. For your convenience, we implemented two ways of reading data from this Object. Both the raw response, as well as the response data dict, are accessible via the ResponseObject's attributes.
+The response objects across all endpoints ("users", "wallets", "assets", "transactions") follow the same structure.
+
+For your convenience, we implemented two ways of reading data from these Objects. Both the raw response, as well as the response data dict, are accessible via the Object's attributes.
 Either you retrieve the actual API response object provided by the Upvest API:
 ```python
 # Retrieve raw response obejct
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-raw_response = clientele.wallet.list().raw
+raw_response = clientele.wallets.all().raw
 ```
 Or you decide to retrieve only the relevant data from the response as a python dict:
 ```python
 # Retrieve response data
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-data_response = clientele.wallet.list().data
+data_response = clientele.wallets.all().data
 ```
-The ResponseObject provides a convienient option for pagination. The Upvest API result arrays are limited to an item count of 10 per page, iteratable via the endpoints provided in the response with the ```next``` and ```previous``` keys. In order to use pagination with the Upvest Python library, simply write:
+For listing all user, wallets and assets, the Upvest API provides pagination. The result count per page is limited to 10 per page, iteratable via the endpoints provided in the response with the ```next``` and ```previous``` keys. In order to use pagination with the Upvest Python library, simply write:
 ```python
 # Previous Page
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-response = clientele.wallet.list()
+response = clientele.wallets.all()
 previous_array = response.previous()
 
 # Next Page
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-response = clientele.wallet.list()
+response = clientele.wallets.all()
 next_array = response.next()
 ```
+The SDK will throw a ```NoPreviousPage``` or a ```NoNextPage``` Exception in case there is nor previous/next page.
 
 Usage
 ------
@@ -68,48 +71,50 @@ Usage
 #### User Endpoint
 ##### Create a user
 ```python
-tenancy.user.create('username','password')
+tenancy.users.create('username','password')
 ```
 ##### List a user
 ```python
-tenancy.user.retrieve('username')
+tenancy.users.get('username')
 ```
 ##### List all users under tenancy
 ```python
-tenancy.user.list()
+tenancy.users.all()
 ```
 ##### Change password of a user
 ```python
-tenancy.user.update('username', 'current_password', 'new_password')
+tenancy.users.get('username').update('current_password', 'new_password')
 ```
 ##### Deregister a user
 ```python
-tenancy.user.delete('username')
+tenancy.user.get('username').delete('username')
 ```
 
 ### Clientele
 #### Assets
 ##### List available assets
 ```python
-clientele.asset.list()
+clientele.assets.all()
 ```
+
 #### Wallets
 ##### Create a wallet for a user
 ```python
-clientele.wallet.create('asset_id')
+clientele.wallets.create('asset_id')
 ```
 ##### List all wallets for a user
 ```python
-clientele.wallet.list()
+clientele.wallets.all()
 ```
 ##### List specific wallet for a user
 ```python
-clientele.wallet.retrieve('wallet_id')
+clientele.wallet.get('wallet_id')
 ```
+
 #### Transactions
 ##### Send transaction
 ```python
-clientele.transaction.send('wallet_id', 'asset_id', 'quantity', 'fee', 'recipient')
+clientele.transactions.send('wallet_id', 'asset_id', 'quantity', 'fee', 'recipient')
 ```
 
 Usage
@@ -128,22 +133,22 @@ John sets up his platform and soon has the first person signing up for his servi
 ```python
 import json
 
-response = tenancy.user.create('Jane Apple','very secret').raw
+response = tenancy.users.create('Jane Apple','very secret').raw
 recovery_kit = response.json()["recoverykit"]
 ```
 After parsing it to JSON, John can extract the recovery kit with `response["recoverykit"]` and pass it on to Jane
 
 ### Wallet Creation
-After creating an account Jane wants to create an Ethereum wallet. In order to do that on behalf of Jane, John needs to initialize an OAuth Object with his client credentials and Jane's username and password. After doing so John can easily create a wallet by providing the respective `asset_id` for Ethereum to the `create_wallet()` function. The asset ids can be retrieved via a call to the Upvest asset endpoint, using the clientele authentication:
+After creating an account Jane wants to create an Ethereum wallet. In order to do that on behalf of Jane, John needs to initialize an OAuth Object with his client credentials and Jane's username and password. After doing so John can easily create a wallet by providing the respective `asset_id` for Ethereum to the `create()` function. The asset ids can be retrieved via a call to the Upvest asset endpoint, using the clientele authentication:
 ```python
 from upvest.tenancy import UpvestClienteleAPI
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
 
 # Listing assets and their ids
-asset_id = clientele.asset.list().data[i]["id"]
+asset_id = clientele.assets.all().data[i]["id"]
 
 # Creating a wallet for Jane on Ethereum
-ethereum_wallet = clientele.create_wallet(asset_id).data
+ethereum_wallet = clientele.wallets.create(asset_id).data
 wallet_address = ethereum_wallet['address']
 ```
 Using the address, Jane is now able to receive funds in her Ethereum wallet on John's platform. Thus, she logs in to her current wallet provider and sends the funds to her newly created wallet.
@@ -152,12 +157,12 @@ Using the address, Jane is now able to receive funds in her Ethereum wallet on J
 After a couple of days, Jane would like to buy a new road bike, paying with Ethereum. The address of the seller is: `0x6720d291A72B8673E774A179434C96D21eb85E71` and Jane would like to transfer 1ETH. As quantity is denoted in Wei (Ethereum smallest unit), John will need to implement an automatic transformation of this amount. The transaction can be sent via the Upvest API making the following call:
 ```python
 # Retrieving Jane's wallet_id
-wallets_of_jane = clientele.wallet.list().data
+wallets_of_jane = clientele.wallets.all().data
 id_wallet = wallets_of_jane[i]["id"]
 recipient = '0x6720d291A72B8673E774A179434C96D21eb85E71'
 
 # Sending the transaction
-transaction = clientele.transaction.send('id_wallet', 'asset_id', '1000000000000000000', '4000000000', 'recipient').data
+transaction = clientele.transactions.send('id_wallet', 'asset_id', '1000000000000000000', '4000000000', 'recipient').data
 tx_hash = transaction["txhash"]
 ```
 

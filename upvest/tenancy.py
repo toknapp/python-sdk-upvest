@@ -1,7 +1,7 @@
 from upvest.config import API_VERSION
 from upvest.config import BASE_URL
 from upvest.authentication import KeyAuth
-from upvest.utils import Request, User, Users
+from upvest.model import UserInstance, Users
 
 class UpvestTenancyAPI(object):
     def __init__(self, api_key, api_secret, api_passphrase):

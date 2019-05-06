@@ -5,6 +5,9 @@ import re
 from upvest.config import API_VERSION
 from upvest.config import BASE_URL
 
+from upvest.exceptions import NoPreviousPage, NoNextPage
+
+# Response Objects, with and without pagination
 class Response(object):
     def __init__(self, result, **req_params):
         self.status_code = result.status_code
@@ -24,16 +27,21 @@ class PaginatedResponse(Response):
     def __init__(self, result, **req_params):
         Response.__init__(self, result, **req_params)
 
-    def previous(self, **req_params):
+    def previous(self):
         link = self.json['previous']
-        self.req_params['path'] = link.split(link, API_VERSION)[-1]
-        return Response(Request().get(**self.req_params))
+        if link == None:
+            raise NoPreviousPage('There is no previous page')
+        self.req_params['path'] = link.split(API_VERSION)[-1]
+        return Request().get(**self.req_params)
+        
+    def next(self):
+        link = self.json['next']
+        if link == None:
+            raise NoNextPage('There is no next page')
+        self.req_params['path'] = link.split(API_VERSION)[-1]
+        return Request().get(**self.req_params)
 
-    def next(self, **req_params):
-        link = self.json()['next']
-        self.req_params['path'] = link.split(link, API_VERSION)[-1]
-        return Response(Request().get(**self.req_params))
-
+# Request object
 class Request(object):
     def __init__(self):
         pass
@@ -72,97 +80,3 @@ class Request(object):
     def delete(self, **req_params):
         req_params['method'] = 'DELETE'
         return self._request(**req_params)
-
-class User(object):
-    def __init__(self, auth_instance, username):
-        self.path = '/tenancy/users/'
-        self.auth_instance = auth_instance
-        self.username = username
-
-    def update(self, current_password, new_password):
-        # Provide current and new password
-        body = {
-            'old_password': current_password,
-            'new_password': new_password,
-        }
-        return Request().patch(auth_instance=self.auth_instance, path=self.path + self.username, body=body)
-
-    def delete(self):
-        # Deregister a user
-        return Request().delete(auth_instance=self.auth_instance, path=self.path + self.username)
-
-class Users(object):
-    def __init__(self, auth_instance):
-        self.path = '/tenancy/users/'
-        self.auth_instance = auth_instance
-    
-    def create(self, username, password):
-        # Set username and password for the user
-        body = {
-            'username': username,
-            'password': password,
-        }
-        return Request().post(auth_instance=self.auth_instance, path=self.path, body=body)
-    
-    def get(self, username):
-        response = Request().get(auth_instance=self.auth_instance, path=self.path + username)
-        username = response.data['username']
-        return User(self.auth_instance, username)
-    
-    def all(self):
-        # Retrieve user list
-        return Request().get(auth_instance=self.auth_instance, path=self.path, response_instance=PaginatedResponse)
-
-class Asset(object):
-    def __init__(self, auth_instance):
-        self.path = '/assets/'
-        self.auth_instance = auth_instance
-
-    def list(self):
-        return Request().get(auth_instance=self.auth_instance, path=self.path, response_instance=PaginatedResponse)
-
-
-class Wallet(object):
-    def __init__(self, auth_instance):
-        self.path = '/kms/wallets/'
-        self.auth_instance = auth_instance
-
-    def list(self):
-        # Retrieve list of all wallets for a user
-        return Request().get(auth_instance=self.auth_instance, path=self.path, response_instance=PaginatedResponse)
-
-    def retrieve(self, wallet_id):
-        # Retrieve specific wallet for a user
-        return Request().get(auth_instance=self.auth_instance, path=self.path + wallet_id)
-
-    def create(self, asset_id):
-        # Get desired asset id from assets list
-        # Provide password and asset_id for wallet creation
-        body = {
-            'password': self.auth_instance.password,
-            'asset_id': asset_id,
-        }
-        return Request().post(auth_instance=self.auth_instance, path=self.path, body=body)
-
-
-class Transaction(object):
-    def __init__(self, auth_instance):
-        self.path = '/tx/'
-        self.auth_instance = auth_instance
-
-    def send(self, wallet_id, asset_id, quantity, fee, recipient):
-        # Provide password and asset_id for wallet creation
-        body = {
-            'password': self.auth_instance.password,
-            'wallet_id': wallet_id,
-            'asset_id': asset_id,
-            'quantity': quantity,
-            'fee': fee,
-            'recipient': recipient,
-        }
-        response = Request().post(auth_instance=self.auth_instance, path=self.path, body=body)
-        return response
-
-    def retrieve(self, txhash):
-        # Define tx endpoint
-        return Request().post(auth_instance=self.auth_instance, path=self.path + txhash)

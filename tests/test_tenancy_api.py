@@ -1,4 +1,5 @@
 import uuid
+import pytest
 
 from tests.partials.client_instance import create_tenancy_client
 from tests.partials.user_creation import create_user
@@ -36,3 +37,14 @@ def test_deregister_user():
     user = create_user()
     response = tenancy_instance.users.get(user['username']).delete()
     assert response.status_code == 204
+
+def test_access_non_existing_previous_page():
+    """Tests whether exception is thrown if there is no previous page in results"""
+    with pytest.raises(Exception) as e:
+        tenancy_instance.users.all().previous()
+    assert str(e.value) == 'There is no previous page'
+
+def test_next_iterator():
+    """Tests whether next iterator works"""
+    results = tenancy_instance.users.all().next().data
+    assert len(results) == 10
