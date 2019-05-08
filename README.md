@@ -35,35 +35,48 @@ All tenancy related operations must be using the API Keys authentication, wherea
 
 The methods allow for passing parameters if needed. If the required arguments are not provided, the respective error will be raised.
 
-#### Response Object
-The response objects across all endpoints ("users", "wallets", "assets", "transactions") follow the same structure.
+### Response Objects
+The response objects across all endpoints ("users", "wallets", "assets", "transactions") follow the same structure. If you retrieve more than one object (for example: `tenancy.users.all()`, a list of objects will be returned.
 
-For your convenience, we implemented two ways of reading data from these Objects. Both the raw response, as well as the response data dict, are accessible via the Object's attributes.
-Either you retrieve the actual API response object provided by the Upvest API:
+#### User Object
+The user response object has the following attributes:
 ```python
-# Retrieve raw response obejct
-clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-raw_response = clientele.wallets.all().raw
+UserObject.username
+UserObject.recoverykit #only if just created
 ```
-Or you decide to retrieve only the relevant data from the response as a python dict:
-```python
-# Retrieve response data
-clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-data_response = clientele.wallets.all().data
-```
-For listing all user, wallets and assets, the Upvest API provides pagination. The result count per page is limited to 10 per page, iteratable via the endpoints provided in the response with the ```next``` and ```previous``` keys. In order to use pagination with the Upvest Python library, simply write:
-```python
-# Previous Page
-clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-response = clientele.wallets.all()
-previous_array = response.previous()
 
-# Next Page
-clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
-response = clientele.wallets.all()
-next_array = response.next()
+#### Wallet Object
+The wallet response object has the following attributes:
+```python
+WalletObject.transactions
+WalletObject.id
+WalletObject.balances
+WalletObject.protocol
+WalletObject.address
+WalletObject.status
 ```
-The SDK will throw a ```NoPreviousPage``` or a ```NoNextPage``` Exception in case there is nor previous/next page.
+
+#### Asset Object
+The transaction response object has the following attributes:
+```python
+AssetObject.id
+AssetObject.name
+AssetObject.symbol
+AssetObject.exponent
+AssetObject.protocol
+AssetObject.metadata
+```
+
+#### Transaction Object
+The transaction response object has the following attributes:
+```python
+TransactionObject.path
+TransactionObject.txhash
+TransactionObject.sender
+TransactionObject.recipient
+TransactionObject.quantity
+TransactionObject.fee
+```
 
 Usage
 ------
@@ -80,6 +93,10 @@ tenancy.users.get('username')
 ##### List all users under tenancy
 ```python
 tenancy.users.all()
+```
+##### List a specific number of users under tenancy
+```python
+tenancy.users.list(40)
 ```
 ##### Change password of a user
 ```python
@@ -106,6 +123,10 @@ clientele.wallets.create('asset_id')
 ```python
 clientele.wallets.all()
 ```
+##### List a specific number of assets
+```python
+clientele.assets.list(40)
+```
 ##### List specific wallet for a user
 ```python
 clientele.wallet.get('wallet_id')
@@ -114,7 +135,8 @@ clientele.wallet.get('wallet_id')
 #### Transactions
 ##### Send transaction
 ```python
-clientele.transactions.send('wallet_id', 'asset_id', 'quantity', 'fee', 'recipient')
+wallet = clientele.wallets.create('asset_id','secret')
+wallet.transactions.create('secret', 'asset_id', 'quantity', 'fee', 'recipient')
 ```
 
 Usage
@@ -133,10 +155,10 @@ John sets up his platform and soon has the first person signing up for his servi
 ```python
 import json
 
-response = tenancy.users.create('Jane Apple','very secret').raw
-recovery_kit = response.json()["recoverykit"]
+user = tenancy.users.create('Jane Apple','very secret').raw
+recovery_kit = user.recovery_kit
 ```
-After parsing it to JSON, John can extract the recovery kit with `response["recoverykit"]` and pass it on to Jane
+After the request, John can access the recovery kit in the user instance and pass it on to Jane.
 
 ### Wallet Creation
 After creating an account Jane wants to create an Ethereum wallet. In order to do that on behalf of Jane, John needs to initialize an OAuth Object with his client credentials and Jane's username and password. After doing so John can easily create a wallet by providing the respective `asset_id` for Ethereum to the `create()` function. The asset ids can be retrieved via a call to the Upvest asset endpoint, using the clientele authentication:
@@ -145,11 +167,11 @@ from upvest.tenancy import UpvestClienteleAPI
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
 
 # Listing assets and their ids
-asset_id = clientele.assets.all().data[i]["id"]
+asset_id = clientele.assets.all()[i].id
 
 # Creating a wallet for Jane on Ethereum
-ethereum_wallet = clientele.wallets.create(asset_id).data
-wallet_address = ethereum_wallet['address']
+ethereum_wallet = clientele.wallets.create(asset_id)
+wallet_address = ethereum_wallet.address
 ```
 Using the address, Jane is now able to receive funds in her Ethereum wallet on John's platform. Thus, she logs in to her current wallet provider and sends the funds to her newly created wallet.
 
@@ -157,13 +179,13 @@ Using the address, Jane is now able to receive funds in her Ethereum wallet on J
 After a couple of days, Jane would like to buy a new road bike, paying with Ethereum. The address of the seller is: `0x6720d291A72B8673E774A179434C96D21eb85E71` and Jane would like to transfer 1ETH. As quantity is denoted in Wei (Ethereum smallest unit), John will need to implement an automatic transformation of this amount. The transaction can be sent via the Upvest API making the following call:
 ```python
 # Retrieving Jane's wallet_id
-wallets_of_jane = clientele.wallets.all().data
-id_wallet = wallets_of_jane[i]["id"]
+wallets_of_jane = clientele.wallets.all()
+wallet = wallets_of_jane[i]
 recipient = '0x6720d291A72B8673E774A179434C96D21eb85E71'
 
 # Sending the transaction
-transaction = clientele.transactions.send('id_wallet', 'asset_id', '1000000000000000000', '4000000000', 'recipient').data
-tx_hash = transaction["txhash"]
+transaction = clientele.wallet.transactions.create('secret', 'asset_id', '1000000000000000000', '4000000000', 'recipient')
+tx_hash = transaction.txhash
 ```
 
 That's it! Jane has successfully sent a transaction and is able to monitor it via [Etherscan](https://etherscan.io).

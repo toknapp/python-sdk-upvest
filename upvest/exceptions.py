@@ -1,5 +1,2 @@
-class NoPreviousPage(Exception):
-    pass
-
-class NoNextPage(Exception):
+class InvalidRequest(Exception):
     pass

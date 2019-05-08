@@ -7,8 +7,5 @@ def create_user():
     username = f'upvest_test{unique_id}'
     password = 'secret'
     tenancy_instance = create_tenancy_client()
-    response = tenancy_instance.users.create(username, password)
-    return {
-        'username': response.data['username'],
-        'password': password
-    }
+    user = tenancy_instance.users.create(username, password)
+    return user

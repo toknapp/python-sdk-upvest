@@ -10,5 +10,4 @@ class UpvestClienteleAPI(object):
         # Create request instance providing access credentials
         self.auth_instance = OAuth(client_id=client_id, client_secret=client_secret, username=username, password=password)
         self.assets = Assets(self.auth_instance)
-        self.transactions = Transactions(self.auth_instance)
         self.wallets = Wallets(self.auth_instance)
