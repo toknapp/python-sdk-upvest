@@ -7,15 +7,15 @@ import requests
 from upvest.config import ENCODING
 from upvest.config import OAUTH_PATH
 from upvest.config import API_VERSION
-from upvest.config import BASE_URL
 from upvest.config import GRANT_TYPE
 from upvest.config import SCOPE
 
 class KeyAuth(object):
-    def __init__(self, api_key=None, api_secret=None, api_passphrase=None, **kwargs):
+    def __init__(self, api_key=None, api_secret=None, api_passphrase=None, base_url=None, **kwargs):
         self.api_key = api_key
         self.api_secret = api_secret
         self.api_passphrase = api_passphrase
+        self.base_url = base_url
 
     def get_headers(self, method=None, path=None, body=None, **kwargs):
         body = json.dumps(body) if body else None
@@ -38,12 +38,13 @@ class KeyAuth(object):
         return headers
 
 class OAuth(object):
-    def __init__(self, client_id=None, client_secret=None, username=None, password=None, **kwargs):
+    def __init__(self, client_id=None, client_secret=None, username=None, password=None, base_url=None, **kwargs):
         self.path = API_VERSION + OAUTH_PATH
         self.client_id = client_id
         self.client_secret = client_secret
         self.username = username
         self.password = password
+        self.base_url = base_url
 
     def get_headers(self, **req_params):
         # Set header content-type to x-www-form-urlencoded
@@ -59,7 +60,7 @@ class OAuth(object):
             'password': self.password,
         }
         # send x-www-form-urlencoded payload to clientele API.
-        r = requests.post(BASE_URL+self.path, data=body, headers=headers)
+        r = requests.post(self.base_url + self.path, data=body, headers=headers)
         # Retrieve and return OAuth token
         oauth_token = r.json()['access_token']
         headers = {

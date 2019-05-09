@@ -1,4 +1,3 @@
-BASE_URL = 'https://api-playground.eu.upvest.co/'
 API_VERSION = '1.0'
 OAUTH_PATH = '/clientele/oauth2/token'
 ENCODING = 'utf-8'

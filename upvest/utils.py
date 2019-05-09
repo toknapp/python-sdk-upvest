@@ -1,15 +1,12 @@
 import json
 import requests
-import re
 
 from upvest.config import API_VERSION
-from upvest.config import BASE_URL
-
+from upvest.exceptions import InvalidRequest
 
 class Response(object):
-    def __init__(self, result, **req_params):
+    def __init__(self, result):
         self.status_code = result.status_code
-        self.req_params = req_params
         self.raw = result
         try:
             self.json = result.json()
@@ -21,17 +18,7 @@ class Response(object):
             #raise ValueError
             self.data = None
 
-    def previous(self,**req_params):
-        link = self.json['previous']
-        self.req_params['path'] = link.split(link, API_VERSION)[-1]
-        return Response(Request().get(**self.req_params))
-
-    def next(self,**req_params):
-        link = self.json()['next']
-        self.req_params['path'] = link.split(link, API_VERSION)[-1]
-        return Response(Request().get(**self.req_params))
-
-
+# Request object
 class Request(object):
     def __init__(self):
         pass
@@ -43,16 +30,23 @@ class Request(object):
         method = req_params.get('method')
         if body is not None:
             for value in body.values():
-                try:
-                    value.encode('ascii')
-                except UnicodeEncodeError:
-                    raise Exception('Forbidden characters present, please remove')
+                if isinstance(value, int):
+                    pass
+                else:
+                    try:
+                        value.encode('ascii')
+                    except UnicodeEncodeError:
+                        raise Exception('Forbidden characters present, please remove')
         # Instantiate the respectively needed auth instance
         auth_instance = req_params.get('auth_instance')
         authenticated_headers = auth_instance.get_headers(**req_params)
         # Execute request with authenticated headers
-        request_url = BASE_URL + API_VERSION + path
-        return Response(requests.request(method, request_url, json=body, headers=authenticated_headers), **req_params)
+        request_url = auth_instance.base_url + API_VERSION + path
+        response = requests.request(method, request_url, json=body, headers=authenticated_headers)
+        if response.status_code >= 300:
+            raise InvalidRequest(response.text)
+        else:
+            return response
 
     def post(self, **req_params):
         req_params['method'] = 'POST'
