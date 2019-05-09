@@ -1,9 +1,7 @@
 import json
 import requests
-import re
 
 from upvest.config import API_VERSION
-from upvest.config import BASE_URL
 from upvest.exceptions import InvalidRequest
 
 class Response(object):
@@ -43,7 +41,7 @@ class Request(object):
         auth_instance = req_params.get('auth_instance')
         authenticated_headers = auth_instance.get_headers(**req_params)
         # Execute request with authenticated headers
-        request_url = BASE_URL + API_VERSION + path
+        request_url = auth_instance.base_url + API_VERSION + path
         response = requests.request(method, request_url, json=body, headers=authenticated_headers)
         if response.status_code >= 300:
             raise InvalidRequest(response.text)

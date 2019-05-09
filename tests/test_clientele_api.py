@@ -1,5 +1,3 @@
-import time
-
 from tests.partials.user_creation import create_user
 from tests.partials.client_instance import create_oauth_client
 
@@ -20,6 +18,20 @@ def test_list_wallet():
     wallet_id = wallets[0].id
     wallet = clientele.wallets.get(wallet_id)
     assert wallet.protocol == 'ethereum_ropsten'
+
+def test_list_wallets():
+    """Tests an API call to list wallets"""
+    clientele = create_oauth_client('alex_test', 'secret')
+    wallets = clientele.wallets.list(2)
+    assert len(wallets) == 2
+
+def test_all_wallets():
+    """Tests an API call to list wallets"""
+    user = create_user()
+    clientele = create_oauth_client(user.username, 'secret')
+    clientele.wallets.create('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f', 'secret')
+    wallets = clientele.wallets.all()
+    assert isinstance(wallets, list)
 
 def test_list_assets():
     """Tests an API call to list assets"""
@@ -52,26 +64,9 @@ def test_send_transaction():
     assert transaction.quantity == '10000000000000000'
     assert transaction.fee == '41180000000000'
 
-# def test_list_transaction():
-#     """Tests an API call to list a specific transaction"""
-#     """Tests an API call to send transactions"""
-#     user = create_user()
-#     clientele = create_oauth_client(user.username, 'secret')
-#     wallet = clientele.wallets.create('deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f','secret')
-#     time.sleep(10)
-#     transaction =  wallet.transactions.create(
-#         'secret',
-#         'deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f',
-#         '10000000000000000',
-#         '41180000000000',
-#         '0x6720d291a72b8673e774a179434c96d21eb85e71'
-#     )
-#     transaction_txhash = transaction.txhash
-
-#     transaction_retrieved = wallet.transactions.get(transaction_txhash)
-#     time.sleep(20)
-#     assert transaction_retrieved.txhash is not None
-#     assert transaction_retrieved.sender is not None
-#     assert transaction_retrieved.recipient == '0x6720d291a72b8673e774a179434c96d21eb85e71'
-#     assert transaction_retrieved.quantity == '10000000000000000'
-#     assert transaction_retrieved.fee == '41180000000000'
+def test_list_transactions():
+    """Tests an API call to list transactions"""
+    clientele = create_oauth_client('alex_test', 'secret')
+    wallet = clientele.wallets.all()[0]
+    transactions = wallet.transactions.list(8)
+    assert len(transactions) == 8

@@ -15,14 +15,14 @@ def test_register_user():
 
 def test_list_user():
     """Tests an API call to get a specific user"""
-    test_user = create_user()
-    user = tenancy_instance.users.get(test_user.username)
-    assert user.username == test_user.username
+    user = tenancy_instance.users.get('alex_test')
+    assert user.username == 'alex_test'
 
-# def test_list_users():
-#     """Tests an API call to get a list of usersr"""
-#     users = tenancy_instance.users.all()
-#     assert len(users) == 2000
+def test_list_155_users():
+    """Tests an API call to get a list of usersr"""
+    users = tenancy_instance.users.list(155)
+    assert len(users) == 155
+    assert isinstance(users[0].username, str)
 
 def test_change_password():
     """Tests an API call to update a user's password"""
@@ -32,19 +32,17 @@ def test_change_password():
     user = tenancy_instance.users.get(user.username).update('new_secret', 'secret')
     assert user.username == username
 
-
 def test_deregister_user():
     """Tests an API call to deregister a user"""
     user = create_user()
     assert tenancy_instance.users.get(user.username).delete() is None
 
-# def test_access_non_existing_previous_page():
-#     """Tests whether exception is thrown if there is no previous page in results"""
-#     with pytest.raises(Exception) as e:
-#         tenancy_instance.users.all().previous()
-#     assert str(e.value) == 'There is no previous page'
-
-# def test_next_iterator():
-#     """Tests whether next iterator works"""
-#     results = tenancy_instance.users.all().next().data
-#     assert len(results) == 10
+def test_list_assets():
+    """Tests an API call to deregister a user"""
+    assets = tenancy_instance.assets.all()
+    assert isinstance(assets, list)
+    assert assets[0].id == '51bfa4b5-6499-5fe2-998b-5fb3c9403ac7'
+    assert assets[0].name == 'Arweave (internal testnet)'
+    assert assets[0].symbol == 'AR'
+    assert assets[0].exponent == 12
+    assert assets[0].protocol == 'arweave_testnet'

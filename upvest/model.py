@@ -1,5 +1,4 @@
-import time
-
+from urllib.parse import urlsplit, urlunsplit, urlencode, parse_qs
 from upvest.utils import Request, Response
 from upvest.config import API_VERSION
 
@@ -18,13 +17,13 @@ class UserInstance(object):
             'new_password': new_password,
         }
         response = Response(Request().patch(auth_instance=self.auth_instance, path=self.path + self.username, body=body))
+        print(response.data)
         username = response.data['username']
         return UserInstance(response, username)
 
     def delete(self):
         # Deregister a user
         return None
-
 
 class Users(object):
     def __init__(self, auth_instance):
@@ -46,58 +45,54 @@ class Users(object):
         response = Response(Request().get(auth_instance=self.auth_instance, path=self.path + username))
         username = response.data['username']
         return UserInstance(self.auth_instance, username)
-
+     
     def list(self, count):
         # Retrieve subset of users
+        MAX_PAGE_SIZE = 100
         array_of_users = []
-        self.path = '/tenancy/users/'
-        if count <= 100:
-            self.path = f'{self.path}?page_size={count}'
-            response = Response(Request().get(auth_instance=self.auth_instance, path=self.path))
+        path = f'/tenancy/users/?page_size={MAX_PAGE_SIZE}'
+        listed_count = 0
+
+        while listed_count < count:
+            response = Response(Request().get(auth_instance=self.auth_instance, path=path))
             for user in response.data:
                 username = user['username']
                 array_of_users.append(UserInstance(self.auth_instance, username))
-            return len(array_of_users)
-        else:
-            i = 0
-            remainder = count % 100
-            iterations = ((count - remainder) / 100)
-            self.path = f'/tenancy/users/?page_size=100'
-            while i < iterations:
-                response = Response(Request().get(auth_instance=self.auth_instance, path=self.path))
-                for user in response.data:
-                    username = user['username']
-                    array_of_users.append(UserInstance(self.auth_instance, username))
-                if response.raw.json()['next'] is None:
-                    return len(array_of_users)
-                else:
-                    self.path = response.raw.json()['next'].split(API_VERSION)[-1]
-                    i += 1
-            if remainder == 0:
-                return len(array_of_users)
+                listed_count += 1 
+                if listed_count >= count:
+                    break
+            if response.raw.json()['next']:
+                page_size = min(MAX_PAGE_SIZE, count - listed_count)
+                path = response.raw.json()['next'].split(API_VERSION)[-1]
+                path_parts = list(urlsplit(path))
+                query = parse_qs(path_parts[3])
+                query['page_size'] = [page_size]
+                path_parts[3] = urlencode(query, doseq=True)
+                path = urlunsplit(path_parts)
             else:
-                without_version = response.raw.json()['next'].split(API_VERSION)[-1]
-                split_path = without_version.split('&page')[0]
-                self.path = f'{split_path}&page_size={remainder}'
-                response = Response(Request().get(auth_instance=self.auth_instance, path=self.path))
-                for user in response.data:
-                    username = user['username']
-                    array_of_users.append(UserInstance(self.auth_instance, username))  
-                return len(array_of_users)  
-            
+                break
+        return array_of_users
+
     def all(self):
-        # Retrieve all users
-        self.path = '/tenancy/users/?page_size=100'
+        MAX_PAGE_SIZE = 100
         array_of_users = []
+        path = '/tenancy/users/?{MAX_PAGE_SIZE}'
+
         while True:
-            response = Response(Request().get(auth_instance=self.auth_instance, path=self.path))
+            response = Response(Request().get(auth_instance=self.auth_instance, path=path))
             for user in response.data:
                 username = user['username']
                 array_of_users.append(UserInstance(self.auth_instance, username))
-            if response.json()['next'] is None:
-                return len(array_of_users)
+            if response.raw.json()['next']:
+                path = response.raw.json()['next'].split(API_VERSION)[-1]
+                path_parts = list(urlsplit(path))
+                query = parse_qs(path_parts[3])
+                query['page_size'] = [MAX_PAGE_SIZE]
+                path_parts[3] = urlencode(query, doseq=True)
+                path = urlunsplit(path_parts)
             else:
-                self.path = response.json()['next'].split(API_VERSION)[-1]
+                break
+        return array_of_users
 
 class AssetInstance(object):
     def __init__(self,**asset_attr):
@@ -114,17 +109,24 @@ class Assets(object):
         self.auth_instance = auth_instance
 
     def all(self):
-        response = Response(Request().get(auth_instance=self.auth_instance, path=self.path))
+        MAX_PAGE_SIZE = 100
         array_of_assets = []
-        for asset in response.data:
-            array_of_assets.append(AssetInstance(**asset))
+        path = '/assets/?{MAX_PAGE_SIZE}'
+
         while True:
-            try:
-                response = Response(Request().get(auth_instance=self.auth_instance, path=self.path))
-                for asset in response.data:
-                    array_of_assets.append(AssetInstance(**asset))
-            except:
-                return array_of_assets
+            response = Response(Request().get(auth_instance=self.auth_instance, path=path))
+            for asset in response.data:
+                array_of_assets.append(AssetInstance(**asset))
+            if response.raw.json()['next']:
+                path = response.raw.json()['next'].split(API_VERSION)[-1]
+                path_parts = list(urlsplit(path))
+                query = parse_qs(path_parts[3])
+                query['page_size'] = [MAX_PAGE_SIZE]
+                path_parts[3] = urlencode(query, doseq=True)
+                path = urlunsplit(path_parts)
+            else:
+                break
+        return array_of_assets
         
 class WalletInstance(object):
     def __init__(self, auth_instance, **wallet_attr):
@@ -155,20 +157,52 @@ class Wallets(object):
         response = Response(Request().get(auth_instance=self.auth_instance, path=self.path + wallet_id))
         return WalletInstance(self.auth_instance, **response.data)
     
-    def all(self):
-        # Retrieve list of all wallets for a user
-        response = Response(Request().get(auth_instance=self.auth_instance, path=self.path))
+    def list(self, count):
+        # Retrieve subset of wallets
+        MAX_PAGE_SIZE = 100
         array_of_wallets = []
+        path = f'/kms/wallets/?page_size={MAX_PAGE_SIZE}'
+        listed_count = 0
 
-        for wallet in response.data:
-            array_of_wallets.append(WalletInstance(self.auth_instance, **wallet))
+        while listed_count < count:
+            response = Response(Request().get(auth_instance=self.auth_instance, path=path))
+            for wallet in response.data:
+                array_of_wallets.append(WalletInstance(self.auth_instance, **wallet))
+                listed_count += 1
+                if listed_count >= count:
+                    break
+            if response.raw.json()['next']:
+                page_size = min(MAX_PAGE_SIZE, count - listed_count)
+                path = response.raw.json()['next'].split(API_VERSION)[-1]
+                path_parts = list(urlsplit(path))
+                query = parse_qs(path_parts[3])
+                query['page_size'] = [page_size]
+                path_parts[3] = urlencode(query, doseq=True)
+                path = urlunsplit(path_parts)
+            else:
+                break
+        return array_of_wallets
+    
+    def all(self):
+        # Retrieve subset of wallets
+        MAX_PAGE_SIZE = 100
+        array_of_wallets = []
+        path = f'/kms/wallets/?page_size={MAX_PAGE_SIZE}'
+
         while True:
-            try:
-                response = Response(Request().get(auth_instance=self.auth_instance, path=self.path))
-                for wallet in response.data:
-                    array_of_wallets.append(WalletInstance(self.auth_instance, **wallet))
-            except:
-                return array_of_wallets
+            response = Response(Request().get(auth_instance=self.auth_instance, path=path))
+            for wallet in response.data:
+                array_of_wallets.append(WalletInstance(self.auth_instance, **wallet))
+            if response.raw.json()['next']:
+                path = response.raw.json()['next'].split(API_VERSION)[-1]
+                path_parts = list(urlsplit(path))
+                query = parse_qs(path_parts[3])
+                query['page_size'] = [MAX_PAGE_SIZE]
+                path_parts[3] = urlencode(query, doseq=True)
+                path = urlunsplit(path_parts)
+            else:
+                break
+        return array_of_wallets
 
 class TransactionInstance(object):
     def __init__(self, **transaction_attr):
@@ -202,5 +236,49 @@ class Transactions(object):
         # Define tx endpoint
         response = Response(Request().get(auth_instance=self.auth_instance, path=f'{self.path}{self.wallet_id}/transactions/{txhash}'))
         return TransactionInstance(**response.data)
-  
 
+    def list(self, count):
+        # Retrieve subset of wallets
+        MAX_PAGE_SIZE = 100
+        array_of_transactions = []
+        path = f'{self.path}{self.wallet_id}/transactions/?page_size={MAX_PAGE_SIZE}'
+        listed_count = 0
+
+        while listed_count < count:
+            response = Response(Request().get(auth_instance=self.auth_instance, path=path))
+            for transaction in response.data:
+                array_of_transactions.append(TransactionInstance(**transaction))
+                listed_count += 1
+                if listed_count >= count:
+                    break
+            if response.raw.json()['next']:
+                page_size = min(MAX_PAGE_SIZE, count - listed_count)
+                path = response.raw.json()['next'].split(API_VERSION)[-1]
+                path_parts = list(urlsplit(path))
+                query = parse_qs(path_parts[3])
+                query['page_size'] = [page_size]
+                path_parts[3] = urlencode(query, doseq=True)
+                path = urlunsplit(path_parts)
+            else:
+                break
+        return array_of_transactions
+
+    def all(self):
+        MAX_PAGE_SIZE = 100
+        array_of_transactions = []
+        path = f'{self.path}{self.wallet_id}/transactions/?page_size={MAX_PAGE_SIZE}'
+
+        while True:
+            response = Response(Request().get(auth_instance=self.auth_instance, path=path))
+            for transaction in response.data:
+                array_of_transactions.append(TransactionInstance(**transaction))
+            if response.raw.json()['next']:
+                path = response.raw.json()['next'].split(API_VERSION)[-1]
+                path_parts = list(urlsplit(path))
+                query = parse_qs(path_parts[3])
+                query['page_size'] = [MAX_PAGE_SIZE]
+                path_parts[3] = urlencode(query, doseq=True)
+                path = urlunsplit(path_parts)
+            else:
+                break
+        return array_of_transactions
