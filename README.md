@@ -1,3 +1,6 @@
+Upvest Python SDK
+#################
+
 Installation
 ------
 The Upvest SDK is available on [PYPI](https://pypi.org). Install with pip:
