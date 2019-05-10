@@ -55,7 +55,7 @@ user.recoverykit # is None if not just created
 #### Wallet object
 The wallet response object has the following properties:
 ```python
-wallet = clientele.wallet.get('wallet_id')
+wallet = clientele.wallets.get('wallet_id')
 wallet.transactions
 wallet.id
 wallet.balances
@@ -92,7 +92,7 @@ transaction.fee
 Usage
 ------
 ### Tenancy
-#### User Endpoint
+#### User management
 ##### Create a user
 ```python
 user = tenancy.users.create('username','password')
@@ -124,6 +124,7 @@ tenancy.user.get('username').delete()
 ```python
 assets = clientele.assets.all()
 ```
+Note that it's also possible to retrieve the same list from `tenancy.assets.all()`.
 
 #### Wallets
 ##### Create a wallet for a user
