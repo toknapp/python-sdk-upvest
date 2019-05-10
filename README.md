@@ -1,6 +1,6 @@
 Installation
 ------
-The Upvest SDK is available on PYPI. Install with pip:
+The Upvest SDK is available on [PYPI](https://pypi.org). Install with pip:
 ```python
 pip install upvest
 ```
@@ -15,11 +15,11 @@ Upvest defines the notion of ‘tenants’, which represent customers that build
 The authentication via API keys and secret allows you to perform all tenant related operations.
 Please create an API key pair within the [Upvest account management](https://login.upvest.co/).
 
-The default BASE_URL for both AuthObjects is 'https://api-playground.eu.upvest.co/', but feel free to adjust it, once you retrieve your live keys.
-Next, create an UpvestTenancyAPI object in order to authenticate your API calls:
+The default `BASE_URL` for both `AuthObjects` is 'https://api.playground.upvest.co', but feel free to adjust it, once you retrieve your live keys.
+Next, create an `UpvestTenancyAPI` object in order to authenticate your API calls:
 ```python
 from upvest.tenancy import UpvestTenancyAPI
-tenancy = UpvestTenancyAPI(API_KEY, API_SECRET, API_PASSPHRASE, BASE_URL(optional))
+tenancy = UpvestTenancyAPI(API_KEY, API_SECRET, API_PASSPHRASE, base_url=BASE_URL) # or base_url=None to use the playground environment (default)
 ```
 
 ### OAuth Authentication
@@ -27,59 +27,63 @@ The authentication via OAuth allows you to perform operations on behalf of your 
 For more information on the OAuth concept, please refer to our [documentation](https://doc.upvest.co/docs/oauth2-authentication).
 Again, please retrieve your client credentials from the [Upvest account management](https://login.upvest.co/).
 
-Next, create an UpvestClienteleAPI object with these credentials and your user authentication data in order to authenticate your API calls on behalf of a user:
+Next, create an `UpvestClienteleAPI` object with these credentials and your user authentication data in order to authenticate your API calls on behalf of a user:
 ```python
 from upvest.clientele import UpvestClienteleAPI
-clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password, BASE_URL(optional))
+clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password, base_url=BASE_URL) # or base_url=None to use the playground environment (default)
 ```
 
 ### API Calls
-All tenancy related operations must be authenticated using the API Keys authentication, whereas all actions on a user's behalf need to be authenticated via OAuth. The API calls are built along with those two authentication objects.
+All tenancy related operations must be authenticated using the API Keys Authentication, whereas all actions on a user's behalf need to be authenticated via OAuth. The API calls are built along with those two authentication objects.
 
 The methods allow for passing parameters if needed. If the required arguments are not provided, a respective error will be raised.
 
 ### Response Objects
-The response objects are designed along `Users, Wallets, Transactions and Assets`. If you retrieve more than one object (for example: `tenancy.users.all()`, a list of those objects will be returned.
+The response objects are designed around users, wallets, transactions and assets. If you retrieve more than one object (for example: `tenancy.users.all()`) a list of those objects will be returned.
 
 #### User Object
-The user response object has the following attributes:
+The user response object has the following properties:
 ```python
-UserObject.username
-UserObject.recoverykit #only if just created
+user = tenancy.users.get('mr-foo')
+user.username
+user.recoverykit # is None if not just created
 ```
 
 #### Wallet Object
-The wallet response object has the following attributes:
+The wallet response object has the following properties:
 ```python
-WalletObject.transactions
-WalletObject.id
-WalletObject.balances
-WalletObject.protocol
-WalletObject.address
-WalletObject.status
+wallet = clientele.wallet.get('wallet_id')
+wallet.transactions
+wallet.id
+wallet.balances
+wallet.protocol
+wallet.address
+wallet.status
 ```
 
 #### Asset Object
-The transaction response object has the following attributes:
+The transaction response object has the following properties:
 ```python
-AssetObject.id
-AssetObject.name
-AssetObject.symbol
-AssetObject.exponent
-AssetObject.protocol
-AssetObject.metadata
+asset, *cdr = clientele.assets.all()
+asset.id
+asset.name
+asset.symbol
+asset.exponent
+asset.protocol
+asset.metadata
 ```
 
 #### Transaction Object
-The transaction response object has the following attributes:
+The transaction response object has the following properties:
 ```python
-TransactionObject.id
-TransactionObject.path
-TransactionObject.hash
-TransactionObject.sender
-TransactionObject.recipient
-TransactionObject.quantity
-TransactionObject.fee
+transaction = wallet.transactions.get('transaction_id')
+transaction.id
+transaction.path
+transaction.hash
+transaction.sender
+transaction.recipient
+transaction.quantity
+transaction.fee
 ```
 
 Usage
@@ -108,7 +112,7 @@ user = tenancy.users.get('username').update('current_password', 'new_password')
 ```
 ##### Delete a user
 ```python
-tenancy.user.get('username').delete('username')
+tenancy.user.get('username').delete()
 ```
 
 ### Clientele
@@ -163,7 +167,7 @@ Usage
 ------
 ## Tutorial
 ### Tenant Creation
-The business "Blockchain4Everyone", founded by John, would like to build a platform for Ethereum wallets with easy access and wallet management. Therefore, John visits the [Upvest Signup Page](https://login.upvest.co/sign-up), creates an account, and retrieves his API keys from the account management page. He is now able to create the API keys Authentication Object:
+The business "Blockchain4Everyone", founded by [John](https://en.wikipedia.org/wiki/The_man_on_the_Clapham_omnibus), would like to build a platform for Ethereum wallets with easy access and wallet management. Therefore, John visits the [Upvest Signup Page](https://login.upvest.co/sign-up), creates an account, and retrieves his API keys from the account management page. He is now able to create the API keys Authentication Object:
 ```python
 # API Keys Object
 from upvest.tenancy import UpvestTenancyAPI
@@ -195,7 +199,7 @@ wallet_address = ethereum_wallet.address
 Using the address, Jane is now able to receive funds in her Ethereum wallet on John's platform. Thus she sends Ethereumfrom her current Ethereum wallet provider and sends the funds to her newly created wallet on John's platform.
 
 ### Transaction Sending
-After a couple of days, Jane would like to buy a new road bike, paying with Ethereum. The address of the seller is: `0x6720d291A72B8673E774A179434C96D21eb85E71` and Jane needs to transfer 1ETH. As quantity is denoted in Wei (Ethereum smallest unit), John will need to implement a transformation of this amount. The transaction can be sent via the Upvest API making the following call:
+After a couple of days, Jane would like to buy a new road bike, paying with Ether. The address of the seller is `0x6720d291A72B8673E774A179434C96D21eb85E71` and Jane needs to transfer 1 ETH. As a quantity it's denoted in [Wei](http://ethdocs.org/en/latest/ether.html#denominations) (Ether's smallest unit), John will need to implement a transformation of this amount. The transaction can be sent via the Upvest API making the following call:
 ```python
 # Retrieving Jane's wallet_id
 wallets_of_jane = clientele.wallets.all()
@@ -203,10 +207,8 @@ wallet = wallets_of_jane[i]
 recipient = '0x6720d291A72B8673E774A179434C96D21eb85E71'
 
 # Sending the transaction
-transaction = clientele.wallet.transactions.create('secret', 'asset_id', '1000000000000000000', '4000000000', 'recipient')
+transaction = wallet.transactions.create('secret', 'asset_id', '1000000000000000000', '4000000000', 'recipient')
 txhash = transaction.txhash
 ```
 
 That's it! Jane has successfully sent a transaction and is able to monitor it via [Etherscan](https://etherscan.io).
-
-
