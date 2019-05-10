@@ -210,7 +210,7 @@ wallet = wallets_of_jane[i]
 recipient = '0x6720d291A72B8673E774A179434C96D21eb85E71'
 
 # Send the transaction
-transaction = wallet.transactions.create('secret', 'asset_id', '1000000000000000000', '4000000000', 'recipient')
+transaction = wallet.transactions.create('secret', 'asset_id', 1000000000000000000, 4000000000, 'recipient')
 txhash = transaction.txhash
 ```
 

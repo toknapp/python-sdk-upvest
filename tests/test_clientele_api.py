@@ -37,7 +37,7 @@ def test_list_assets():
     """Tests an API call to list assets"""
     user = create_user()
     clientele = create_oauth_client(user.username, 'secret')
-    assets = clientele.assets.all() 
+    assets = clientele.assets.all()
     assert isinstance(assets, list)
     assert assets[0].id == '51bfa4b5-6499-5fe2-998b-5fb3c9403ac7'
     assert assets[0].name == 'Arweave (internal testnet)'
@@ -53,16 +53,16 @@ def test_send_transaction():
     transaction =  wallet.transactions.create(
         'secret',
         'deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f',
-        '10000000000000000',
-        '41180000000000',
+        10000000000000000,
+        41180000000000,
         '0x6720d291a72b8673e774a179434c96d21eb85e71'
     )
     assert transaction.id is not None
     assert transaction.txhash is not None
     assert transaction.sender is not None
     assert transaction.recipient == '0x6720d291a72b8673e774a179434c96d21eb85e71'
-    assert transaction.quantity == '10000000000000000'
-    assert transaction.fee == '41180000000000'
+    assert transaction.quantity == 10000000000000000
+    assert transaction.fee == 41180000000000
 
 def test_list_transactions():
     """Tests an API call to list transactions"""

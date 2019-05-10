@@ -44,7 +44,7 @@ class Users(object):
         response = Response(Request().get(auth_instance=self.auth_instance, path=self.path + username))
         username = response.data['username']
         return UserInstance(self.auth_instance, username)
-     
+
     def list(self, count):
         # Retrieve subset of users
         MAX_PAGE_SIZE = 100
@@ -57,7 +57,7 @@ class Users(object):
             for user in response.data:
                 username = user['username']
                 array_of_users.append(UserInstance(self.auth_instance, username))
-                listed_count += 1 
+                listed_count += 1
                 if listed_count >= count:
                     break
             if response.raw.json()['next']:
@@ -126,7 +126,7 @@ class Assets(object):
             else:
                 break
         return array_of_assets
-        
+
 class WalletInstance(object):
     def __init__(self, auth_instance, **wallet_attr):
         self.transactions = Transactions(auth_instance, wallet_attr['id'])
@@ -155,7 +155,7 @@ class Wallets(object):
         # Retrieve specific wallet for a user
         response = Response(Request().get(auth_instance=self.auth_instance, path=self.path + wallet_id))
         return WalletInstance(self.auth_instance, **response.data)
-    
+
     def list(self, count):
         # Retrieve subset of wallets
         MAX_PAGE_SIZE = 100
@@ -181,7 +181,7 @@ class Wallets(object):
             else:
                 break
         return array_of_wallets
-    
+
     def all(self):
         # Retrieve subset of wallets
         MAX_PAGE_SIZE = 100
@@ -210,8 +210,8 @@ class TransactionInstance(object):
         self.txhash = transaction_attr['txhash']
         self.sender = transaction_attr['sender']
         self.recipient = transaction_attr['recipient']
-        self.quantity = transaction_attr['quantity']
-        self.fee = transaction_attr['fee']
+        self.quantity = int(transaction_attr['quantity'])
+        self.fee = int(transaction_attr['fee'])
 
 class Transactions(object):
     def __init__(self, auth_instance, wallet_id):
@@ -225,11 +225,11 @@ class Transactions(object):
             'password': password,
             'wallet_id': self.wallet_id,
             'asset_id': asset_id,
-            'quantity': quantity,
-            'fee': fee,
+            'quantity': str(quantity),
+            'fee': str(fee),
             'recipient': recipient,
         }
-        response = Response(Request().post(auth_instance=self.auth_instance, path=f'{self.path}{self.wallet_id}/transactions/', body=body))    
+        response = Response(Request().post(auth_instance=self.auth_instance, path=f'{self.path}{self.wallet_id}/transactions/', body=body))
         return TransactionInstance(**response.data)
 
     def get(self, id):
