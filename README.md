@@ -67,7 +67,7 @@ wallet.status
 #### Asset object
 The transaction response object has the following properties:
 ```python
-asset, *cdr = clientele.assets.all()
+asset, *rest = clientele.assets.all()
 asset.id
 asset.name
 asset.symbol
@@ -111,7 +111,7 @@ users = tenancy.users.list(10)
 ```
 ##### Change password of a user
 ```python
-user = tenancy.users.get('username').update('current_password', 'new_password')
+user = tenancy.users.get('username').update(password='current_password', new_password='new_password')
 ```
 ##### Delete a user
 ```python

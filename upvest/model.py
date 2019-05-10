@@ -10,10 +10,10 @@ class UserInstance(object):
         self.username = username
         self.recovery_kit = recovery_kit
 
-    def update(self, current_password, new_password):
+    def update(self, password, new_password):
         # Provide current and new password
         body = {
-            'old_password': current_password,
+            'old_password': password,
             'new_password': new_password,
         }
         response = Response(Request().patch(auth_instance=self.auth_instance, path=self.path + self.username, body=body))
