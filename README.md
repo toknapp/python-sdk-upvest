@@ -87,23 +87,23 @@ Usage
 #### User Endpoint
 ##### Create a user
 ```python
-tenancy.users.create('username','password')
+user = tenancy.users.create('username','password')
 ```
 ##### Retrieve a user
 ```python
-tenancy.users.get('username')
+user = tenancy.users.get('username')
 ```
 ##### List all users under tenancy
 ```python
-tenancy.users.all()
+users = tenancy.users.all()
 ```
 ##### List a specific number of users under tenancy
 ```python
-tenancy.users.list(10)
+users = tenancy.users.list(10)
 ```
 ##### Change password of a user
 ```python
-tenancy.users.get('username').update('current_password', 'new_password')
+user = tenancy.users.get('username').update('current_password', 'new_password')
 ```
 ##### Delete a user
 ```python
@@ -114,47 +114,47 @@ tenancy.user.get('username').delete('username')
 #### Assets
 ##### List available assets
 ```python
-clientele.assets.all()
+assets = clientele.assets.all()
 ```
 
 #### Wallets
 ##### Create a wallet for a user
 ```python
-clientele.wallets.create('asset_id', 'password)
+wallet = clientele.wallets.create('asset_id', 'password')
 ```
 ##### Retrieve specific wallet for a user
 ```python
-clientele.wallet.get('wallet_id')
+wallet = clientele.wallet.get('wallet_id')
 ```
 ##### List all wallets for a user
 ```python
-clientele.wallets.all()
+wallets = clientele.wallets.all()
 ```
 ##### List a specific number of wallets
 ```python
-clientele.wallets.list(40)
+wallets = clientele.wallets.list(40)
 ```
 
 #### Transactions
 ##### Create transaction
 ```python
 wallet = clientele.wallets.create('asset_id','secret')
-wallet.transactions.create('secret', 'asset_id', 'quantity', 'fee', 'recipient')
+transaction = wallet.transactions.create('secret', 'asset_id', 'quantity', 'fee', 'recipient')
 ```
 #### Retrieve specific transaction
 ```python
 wallet = clientele.wallets.create('asset_id','secret')
-wallet.transactions.get('txhash')
+transaction = wallet.transactions.get('txhash')
 ```
 ##### List all transactions of a wallet for a user
 ```python
 wallet = clientele.wallets.create('asset_id','secret')
-wallet.transactions.all()
+transactions = wallet.transactions.all()
 ```
 ##### List a specific number of transactions of a wallet for a user
 ```python
 wallet = clientele.wallets.create('asset_id','secret')
-wallet.transactions.list(8)
+transactions = wallet.transactions.list(8)
 ```
 
 Usage

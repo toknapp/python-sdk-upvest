@@ -17,7 +17,6 @@ class UserInstance(object):
             'new_password': new_password,
         }
         response = Response(Request().patch(auth_instance=self.auth_instance, path=self.path + self.username, body=body))
-        print(response.data)
         username = response.data['username']
         return UserInstance(response, username)
 

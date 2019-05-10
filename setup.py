@@ -38,7 +38,7 @@ setuptools.setup(
     maintainer_email="alexander@upvest.co",
     description="Upvest API client library",
     keywords=_KEYWORDS,
-    # license='licence',
+    license='MIT',
     long_description=_README,
     long_description_content_type="text/markdown",
     url="https://github.com/toknapp/python-sdk-upvest/",
