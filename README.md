@@ -1,5 +1,5 @@
 Upvest Python SDK
-#################
+=================
 
 Installation
 ------
