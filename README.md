@@ -18,7 +18,7 @@ The Upvest API uses the notion of _tenants_, which represent customers that buil
 The authentication via API keys and secret allows you to perform all tenant related operations.
 Please create an API key pair within the [Upvest account management](https://login.upvest.co/).
 
-The default `BASE_URL` for both authentication objects is 'https://api.playground.upvest.co', but feel free to adjust it, once you retrieve your live keys.
+The default `BASE_URL` for both authentication objects is `https://api.playground.upvest.co`, but feel free to adjust it, once you retrieve your live keys.
 Next, create an `UpvestTenancyAPI` object in order to authenticate your API calls:
 ```python
 from upvest.tenancy import UpvestTenancyAPI
