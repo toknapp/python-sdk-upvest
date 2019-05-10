@@ -15,7 +15,7 @@ Upvest defines the notion of ‘tenants’, which represent customers that build
 The authentication via API keys and secret allows you to perform all tenant related operations.
 Please create an API key pair within the [Upvest account management](https://login.upvest.co/).
 
-The default `BASE_URL` for both `AuthObjects` is 'https://api.playground.upvest.co', but feel free to adjust it, once you retrieve your live keys.
+The default `BASE_URL` for both authentication objects is 'https://api.playground.upvest.co', but feel free to adjust it, once you retrieve your live keys.
 Next, create an `UpvestTenancyAPI` object in order to authenticate your API calls:
 ```python
 from upvest.tenancy import UpvestTenancyAPI
@@ -38,10 +38,10 @@ All tenancy related operations must be authenticated using the API Keys Authenti
 
 The methods allow for passing parameters if needed. If the required arguments are not provided, a respective error will be raised.
 
-### Response Objects
+### Response objects
 The response objects are designed around users, wallets, transactions and assets. If you retrieve more than one object (for example: `tenancy.users.all()`) a list of those objects will be returned.
 
-#### User Object
+#### User object
 The user response object has the following properties:
 ```python
 user = tenancy.users.get('mr-foo')
@@ -49,7 +49,7 @@ user.username
 user.recoverykit # is None if not just created
 ```
 
-#### Wallet Object
+#### Wallet object
 The wallet response object has the following properties:
 ```python
 wallet = clientele.wallet.get('wallet_id')
@@ -61,7 +61,7 @@ wallet.address
 wallet.status
 ```
 
-#### Asset Object
+#### Asset object
 The transaction response object has the following properties:
 ```python
 asset, *cdr = clientele.assets.all()
@@ -73,7 +73,7 @@ asset.protocol
 asset.metadata
 ```
 
-#### Transaction Object
+#### Transaction object
 The transaction response object has the following properties:
 ```python
 transaction = wallet.transactions.get('transaction_id')
@@ -167,9 +167,9 @@ Usage
 ------
 ## Tutorial
 ### Tenant Creation
-The business "Blockchain4Everyone", founded by [John](https://en.wikipedia.org/wiki/The_man_on_the_Clapham_omnibus), would like to build a platform for Ethereum wallets with easy access and wallet management. Therefore, John visits the [Upvest Signup Page](https://login.upvest.co/sign-up), creates an account, and retrieves his API keys from the account management page. He is now able to create the API keys Authentication Object:
+The business "Blockchain4Everyone", founded by [John](https://en.wikipedia.org/wiki/The_man_on_the_Clapham_omnibus), would like to build a platform for Ethereum wallets with easy access and wallet management. Therefore, John visits the [Upvest Signup Page](https://login.upvest.co/sign-up), creates an account, and retrieves his API keys from the account management page. He is now able to create the API Keys Authentication object:
 ```python
-# API Keys Object
+# API Keys object
 from upvest.tenancy import UpvestTenancyAPI
 tenancy = UpvestTenancyAPI(API_KEY, API_SECRET, API_PASSPHRASE)
 ```
@@ -183,16 +183,16 @@ recovery_kit = user.recovery_kit
 After the request, John can access the recovery kit in the user instance and pass it on to Jane. Recovery kits are encrypted using a public key whose private counterpart is provided to tenants at sign-up on the Upvest Account Management portal, and not stored by Upvest. In case Jane loses her password, John is able to reset her password on her behalf, using her password and his decryption key, after conducting a proper KYC process in order to prevent identity fraud.
 
 ### Wallet Creation
-After creating an account Jane wants to create an Ethereum wallet on John's platform. In order to do that on behalf of Jane, John needs to initialize an OAuth Object with his client credentials and Jane's username and password. After doing so, John can easily create a wallet by providing the respective `asset_id` for Ethereum to the `wallets.create()` function. The `asset_id` can be retrieved via a call to the Upvest asset endpoint, using the clientele or tenancy authentication:
+After creating an account Jane wants to create an Ethereum wallet on John's platform. In order to do that on behalf of Jane, John needs to initialize an OAuth object with his client credentials and Jane's username and password. After doing so, John can easily create a wallet by providing the respective `asset_id` for Ethereum to the `wallets.create()` function. The `asset_id` can be retrieved via a call to the Upvest asset endpoint, using the clientele or tenancy authentication:
 ```python
 from upvest.tenancy import UpvestClienteleAPI
 clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
 
-# Listing assets and their ids
+# List assets and their ids
 asset_id = clientele.assets.all()[i].id
 asset_id = tenancy.assets.all()[i].id
 
-# Creating a wallet for Jane on Ethereum with her password and the respective asset_id
+# Create a wallet for Jane on Ethereum with her password and the respective asset_id
 ethereum_wallet = clientele.wallets.create(asset_id, 'very_secret')
 wallet_address = ethereum_wallet.address
 ```
@@ -201,12 +201,12 @@ Using the address, Jane is now able to receive funds in her Ethereum wallet on J
 ### Transaction Sending
 After a couple of days, Jane would like to buy a new road bike, paying with Ether. The address of the seller is `0x6720d291A72B8673E774A179434C96D21eb85E71` and Jane needs to transfer 1 ETH. As a quantity it's denoted in [Wei](http://ethdocs.org/en/latest/ether.html#denominations) (Ether's smallest unit), John will need to implement a transformation of this amount. The transaction can be sent via the Upvest API making the following call:
 ```python
-# Retrieving Jane's wallet_id
+# Retrieve Jane's wallet_id
 wallets_of_jane = clientele.wallets.all()
 wallet = wallets_of_jane[i]
 recipient = '0x6720d291A72B8673E774A179434C96D21eb85E71'
 
-# Sending the transaction
+# Send the transaction
 transaction = wallet.transactions.create('secret', 'asset_id', '1000000000000000000', '4000000000', 'recipient')
 txhash = transaction.txhash
 ```
