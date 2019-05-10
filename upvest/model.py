@@ -206,6 +206,7 @@ class Wallets(object):
 class TransactionInstance(object):
     def __init__(self, **transaction_attr):
         self.path = '/kms/wallets/'
+        self.id = transaction_attr['id']
         self.txhash = transaction_attr['txhash']
         self.sender = transaction_attr['sender']
         self.recipient = transaction_attr['recipient']
@@ -231,9 +232,9 @@ class Transactions(object):
         response = Response(Request().post(auth_instance=self.auth_instance, path=f'{self.path}{self.wallet_id}/transactions/', body=body))    
         return TransactionInstance(**response.data)
 
-    def get(self, txhash):
+    def get(self, id):
         # Define tx endpoint
-        response = Response(Request().get(auth_instance=self.auth_instance, path=f'{self.path}{self.wallet_id}/transactions/{txhash}'))
+        response = Response(Request().get(auth_instance=self.auth_instance, path=f'{self.path}{self.wallet_id}/transactions/{id}'))
         return TransactionInstance(**response.data)
 
     def list(self, count):

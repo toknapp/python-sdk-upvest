@@ -73,8 +73,9 @@ AssetObject.metadata
 #### Transaction Object
 The transaction response object has the following attributes:
 ```python
+TransactionObject.id
 TransactionObject.path
-TransactionObject.txhash
+TransactionObject.hash
 TransactionObject.sender
 TransactionObject.recipient
 TransactionObject.quantity
@@ -144,7 +145,8 @@ transaction = wallet.transactions.create('secret', 'asset_id', 'quantity', 'fee'
 #### Retrieve specific transaction
 ```python
 wallet = clientele.wallets.create('asset_id','secret')
-transaction = wallet.transactions.get('txhash')
+id = wallet.transactions.all()[i].id
+transaction = wallet.transactions.get(id)
 ```
 ##### List all transactions of a wallet for a user
 ```python
@@ -202,7 +204,7 @@ recipient = '0x6720d291A72B8673E774A179434C96D21eb85E71'
 
 # Sending the transaction
 transaction = clientele.wallet.transactions.create('secret', 'asset_id', '1000000000000000000', '4000000000', 'recipient')
-tx_hash = transaction.txhash
+txhash = transaction.txhash
 ```
 
 That's it! Jane has successfully sent a transaction and is able to monitor it via [Etherscan](https://etherscan.io).

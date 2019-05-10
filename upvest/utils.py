@@ -42,8 +42,10 @@ class Request(object):
         authenticated_headers = auth_instance.get_headers(**req_params)
         # Execute request with authenticated headers
         request_url = auth_instance.base_url + API_VERSION + path
+        print(request_url)
         response = requests.request(method, request_url, json=body, headers=authenticated_headers)
         if response.status_code >= 300:
+            print(response.status_code)
             raise InvalidRequest(response.text)
         else:
             return response

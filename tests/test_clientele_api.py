@@ -57,7 +57,7 @@ def test_send_transaction():
         '41180000000000',
         '0x6720d291a72b8673e774a179434c96d21eb85e71'
     )
-
+    assert transaction.id is not None
     assert transaction.txhash is not None
     assert transaction.sender is not None
     assert transaction.recipient == '0x6720d291a72b8673e774a179434c96d21eb85e71'
@@ -70,3 +70,11 @@ def test_list_transactions():
     wallet = clientele.wallets.all()[0]
     transactions = wallet.transactions.list(8)
     assert len(transactions) == 8
+
+def test_retrieve_transactions():
+    """Tests an API call to list transaction"""
+    clientele = create_oauth_client('alex_test', 'secret')
+    wallet = clientele.wallets.all()[0]
+    id = wallet.transactions.all()[0].id
+    transaction = wallet.transactions.get(id)
+    assert transaction.txhash == '0x029dd84294f4efbc9857a776e2acff0743dec31b8d9e2759872724a80b240e77'
