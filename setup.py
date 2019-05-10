@@ -31,7 +31,7 @@ _PACKAGES = setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*",
 
 setuptools.setup(
     name="upvest",
-    version="0.0.3",
+    version="0.0.1",
     author="Upvest GmbH",
     author_email="tech@upvest.co",
     maintainer="Alexander Reichhardt",
