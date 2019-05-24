@@ -160,26 +160,26 @@ class WalletInstance(object):
         self.address = wallet_attr['address']
         self.status = wallet_attr['status']
 
-    def sign(self, password, message=None, hash=None, hash_algorithm='SHA256'):
-        if hash is None and message is not None:
+    def sign(self, password, message=None, to_sign_hash=None, hash_algorithm='SHA256'):
+        if to_sign_hash is None and message is not None:
             if not isinstance(message, (bytes, bytearray)):
                 raise TypeError("message argument is not a bytes-like object")
 
             if hash_algorithm is 'SHA256':
-                hash = hashlib.sha256(message).digest()
+                to_sign_hash = hashlib.sha256(message).digest()
             else:
                 raise ValueError(f'unsupported hash_algorithm: {hash_algorithm}')
 
-        if hash is None:
-            raise ValueError(f'neither message nor hash were provided')
+        if to_sign_hash is None:
+            raise ValueError(f'neither message nor to_sign_hash were provided')
 
         body = {
             'password': password,
-            'to_sign': str(b64encode(hash), "UTF-8"),
+            'to_sign': str(b64encode(to_sign_hash), "UTF-8"),
             'output_format': 'int',
         }
         rsp = Response(Request().post(auth_instance=self.auth_instance, path=f'{self.path}/sign', body=body))
-        return ECDSASignature(signed_hash=hash, j=rsp.data)
+        return ECDSASignature(signed_hash=to_sign_hash, j=rsp.data)
 
 class Wallets(object):
     def __init__(self, auth_instance):
