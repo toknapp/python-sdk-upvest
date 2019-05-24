@@ -1,16 +1,17 @@
 import uuid
 import pytest
 
-from tests.partials.client_instance import create_tenancy_client
-from tests.partials.user_creation import create_user
+from .partials.client_instance import create_tenancy_client
+from .partials.user_creation import create_user
+from . import fresh
 
 tenancy = create_tenancy_client()
 
 def test_register_user():
     """Tests an API call to create a user"""
-    unique_id = uuid.uuid4()
-    user = tenancy.users.create(f'upvest_test_{unique_id}','secret')
-    assert user.username == f'upvest_test_{unique_id}'
+    username = f'upvest_test_{uuid.uuid4()}'
+    user = tenancy.users.create(username, fresh.password())
+    assert user.username == username
     assert user.recovery_kit is not None
 
 def test_list_user():
@@ -26,15 +27,16 @@ def test_list_155_users():
 
 def test_change_password():
     """Tests an API call to update a user's password"""
-    user = create_user()
+    user, pw = create_user()
+    new_pw = fresh.password()
     username = user.username
-    user = tenancy.users.get(user.username).update('secret','new_secret')
-    user = tenancy.users.get(user.username).update('new_secret', 'secret')
+    user = tenancy.users.get(user.username).update(pw, new_pw)
+    user = tenancy.users.get(user.username).update(new_pw, pw)
     assert user.username == username
 
 def test_deregister_user():
     """Tests an API call to deregister a user"""
-    user = create_user()
+    user, _ = create_user()
     assert tenancy.users.get(user.username).delete() is None
 
 def test_list_assets():

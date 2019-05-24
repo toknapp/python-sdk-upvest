@@ -6,7 +6,11 @@ export PIP = $(VENV)/bin/pip
 export PYTEST = $(VENV)/bin/pytest
 
 test: deps
+ifdef TESTS
+	$(PYTEST) -v -k "$(TESTS)"
+else
 	$(PYTEST) -v
+endif
 
 deps: .requirements.flag
 
