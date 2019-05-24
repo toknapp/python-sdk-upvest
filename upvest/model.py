@@ -142,7 +142,7 @@ class WalletInstance(object):
         self.status = wallet_attr['status']
 
     def sign(self, password, message=None, hash=None, hash_algorithm='SHA256'):
-        if not hash and message:
+        if hash is None and message is not None:
             if not isinstance(message, (bytes, bytearray)):
                 raise TypeError("message argument is not a bytes-like object")
 
@@ -153,7 +153,7 @@ class WalletInstance(object):
             else:
                 raise ValueError(f'unsupported hash_algorithm: {hash_algorithm}')
 
-        if not hash:
+        if hash is None:
             raise ValueError(f'neither message nor hash were provided')
 
         body = {
