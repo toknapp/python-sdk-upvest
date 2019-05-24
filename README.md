@@ -1,6 +1,8 @@
 Upvest Python SDK
 =================
 
+[![CircleCI](https://circleci.com/gh/toknapp/python-sdk-upvest/tree/master.svg?style=svg)](https://circleci.com/gh/toknapp/python-sdk-upvest/tree/master)
+
 Installation
 ------
 The Upvest SDK is available on [PYPI](https://pypi.org). Install with pip:
