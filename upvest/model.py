@@ -1,3 +1,6 @@
+from base64 import b64encode
+import hashlib
+
 from urllib.parse import urlsplit, urlunsplit, urlencode, parse_qs
 from upvest.utils import Request, Response
 from upvest.config import API_VERSION
@@ -129,12 +132,36 @@ class Assets(object):
 
 class WalletInstance(object):
     def __init__(self, auth_instance, **wallet_attr):
+        self.auth_instance = auth_instance
         self.transactions = Transactions(auth_instance, wallet_attr['id'])
         self.id = wallet_attr['id']
+        self.path = f'/kms/wallets/{self.id}'
         self.balances = wallet_attr['balances']
         self.protocol  = wallet_attr['protocol']
         self.address = wallet_attr['address']
         self.status = wallet_attr['status']
+
+    def sign(self, password, message=None, hash=None, hash_algorithm='SHA256'):
+        if not hash and message:
+            if not isinstance(message, (bytes, bytearray)):
+                raise TypeError("message argument is not a bytes-like object")
+
+            if hash_algorithm is 'SHA256':
+                d = hashlib.sha256()
+                d.update(message)
+                hash = d.digest()
+            else:
+                raise ValueError(f'unsupported hash_algorithm: {hash_algorithm}')
+
+        if not hash:
+            raise ValueError(f'neither message nor hash were provided')
+
+        body = {
+            'password': password,
+            'to_sign': str(b64encode(hash), "UTF-8"),
+        }
+        rsp = Response(Request().post(auth_instance=self.auth_instance, path=f'{self.path}/sign', body=body))
+        return rsp.data
 
 class Wallets(object):
     def __init__(self, auth_instance):

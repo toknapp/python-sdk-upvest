@@ -1,5 +1,6 @@
 from .partials.user_creation import create_user
 from .partials.client_instance import create_oauth_client
+from . import fresh
 
 ETHEREUM_ROPSTEN_ASSET_ID = 'deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f'
 
@@ -80,3 +81,14 @@ def test_retrieve_transactions():
     id = wallet.transactions.all()[0].id
     transaction = wallet.transactions.get(id)
     assert transaction.txhash == '0x029dd84294f4efbc9857a776e2acff0743dec31b8d9e2759872724a80b240e77'
+
+def test_gpsi_ethereum():
+    """Tests an API call to the General Purpose Signing Interface using an Etherum key (secp256k1)"""
+    user, pw = create_user()
+    clientele = create_oauth_client(user.username, pw)
+    wallet = clientele.wallets.create(ETHEREUM_ROPSTEN_ASSET_ID, pw)
+
+    message = fresh.bs(1024) # e.g. imagine this is a PDF or a authentication challenge
+    signature = wallet.sign(pw, message)
+
+    # TODO: verify signature
