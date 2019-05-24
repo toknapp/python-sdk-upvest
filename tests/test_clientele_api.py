@@ -1,6 +1,9 @@
 from .partials.user_creation import create_user
 from .partials.client_instance import create_oauth_client
 from . import fresh
+from py_ecc.secp256k1 import ecdsa_raw_recover
+import hashlib, sha3
+from binascii import hexlify
 
 ETHEREUM_ROPSTEN_ASSET_ID = 'deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f'
 
@@ -82,6 +85,10 @@ def test_retrieve_transactions():
     transaction = wallet.transactions.get(id)
     assert transaction.txhash == '0x029dd84294f4efbc9857a776e2acff0743dec31b8d9e2759872724a80b240e77'
 
+def pubkey_to_ethereum_address(pk):
+    kec = sha3.keccak_256(pk.x.to_bytes(32, "big") + pk.y.to_bytes(32, "big")).digest()
+    return "0x" + str(hexlify(kec[-20:]), "UTF-8")
+
 def test_gpsi_ethereum():
     """Tests an API call to the General Purpose Signing Interface using an Etherum key (secp256k1)"""
     user, pw = create_user()
@@ -91,4 +98,10 @@ def test_gpsi_ethereum():
     message = fresh.bs(1024) # e.g. imagine this is a PDF or a authentication challenge
     signature = wallet.sign(pw, message)
 
-    # TODO: verify signature
+    assert signature.curve == "secp256k1"
+    assert hashlib.sha256(message).digest() == signature.signed_hash
+
+    x, y = ecdsa_raw_recover(signature.signed_hash, (27 + signature.recover, signature.r, signature.s))
+    assert x == signature.x
+    assert y == signature.y
+    assert pubkey_to_ethereum_address(signature) == clientele.wallets.get(wallet.id).address

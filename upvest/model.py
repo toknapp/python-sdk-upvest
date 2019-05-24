@@ -130,6 +130,25 @@ class Assets(object):
                 break
         return array_of_assets
 
+class ECDSASignature:
+    def __init__(self, signed_hash, j):
+        self.algorithm = j["algorithm"]
+        if self.algorithm != "ECDSA":
+            raise ValueError(f"unsupported algorithm: {self.algorithm}")
+
+        self.curve = j["curve"]
+        self.x = j["public_key"]["x"]
+        self.y = j["public_key"]["y"]
+        self.r = j["r"]
+        self.s = j["s"]
+        self.signed_hash = signed_hash
+
+        if self.curve == "secp256k1":
+            self.recover = j["recover"]
+        else:
+            # TODO: is pubkey recovery possible for other curves?
+            pass
+
 class WalletInstance(object):
     def __init__(self, auth_instance, **wallet_attr):
         self.auth_instance = auth_instance
@@ -147,9 +166,7 @@ class WalletInstance(object):
                 raise TypeError("message argument is not a bytes-like object")
 
             if hash_algorithm is 'SHA256':
-                d = hashlib.sha256()
-                d.update(message)
-                hash = d.digest()
+                hash = hashlib.sha256(message).digest()
             else:
                 raise ValueError(f'unsupported hash_algorithm: {hash_algorithm}')
 
@@ -159,9 +176,10 @@ class WalletInstance(object):
         body = {
             'password': password,
             'to_sign': str(b64encode(hash), "UTF-8"),
+            'output_format': 'int',
         }
         rsp = Response(Request().post(auth_instance=self.auth_instance, path=f'{self.path}/sign', body=body))
-        return rsp.data
+        return ECDSASignature(signed_hash=hash, j=rsp.data)
 
 class Wallets(object):
     def __init__(self, auth_instance):
