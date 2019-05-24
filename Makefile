@@ -12,10 +12,10 @@ else
 	$(PYTEST) -v
 endif
 
-deps: .requirements.flag
-test-deps: .requirements.flag .requirements.test.flag
+deps: .requirements.upvest.flag
+test-deps: .requirements.upvest.flag .requirements.test.flag
 
-.requirements%.flag: requirements%.txt | $(VENV)
+.requirements.%.flag: requirements.%.txt | $(VENV)
 	$(PIP) install -r $<
 	touch $@
 
