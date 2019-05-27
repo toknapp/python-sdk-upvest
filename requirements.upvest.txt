@@ -1,3 +1,2 @@
 requests==2.21.0
-pytest==4.2.0
 environs==4.1.0

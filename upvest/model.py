@@ -1,3 +1,6 @@
+from base64 import b64encode
+import hashlib
+
 from urllib.parse import urlsplit, urlunsplit, urlencode, parse_qs
 from upvest.utils import Request, Response
 from upvest.config import API_VERSION
@@ -127,14 +130,56 @@ class Assets(object):
                 break
         return array_of_assets
 
+class ECDSASignature:
+    def __init__(self, signed_hash, j):
+        self.algorithm = j["algorithm"]
+        if self.algorithm != "ECDSA":
+            raise ValueError(f"unsupported algorithm: {self.algorithm}")
+
+        self.curve = j["curve"]
+        self.x = j["public_key"]["x"]
+        self.y = j["public_key"]["y"]
+        self.r = j["r"]
+        self.s = j["s"]
+        self.signed_hash = signed_hash
+
+        if self.curve == "secp256k1":
+            self.recover = j["recover"]
+        else:
+            # TODO: is pubkey recovery possible for other curves?
+            pass
+
 class WalletInstance(object):
     def __init__(self, auth_instance, **wallet_attr):
+        self.auth_instance = auth_instance
         self.transactions = Transactions(auth_instance, wallet_attr['id'])
         self.id = wallet_attr['id']
+        self.path = f'/kms/wallets/{self.id}'
         self.balances = wallet_attr['balances']
         self.protocol  = wallet_attr['protocol']
         self.address = wallet_attr['address']
         self.status = wallet_attr['status']
+
+    def sign(self, password, message=None, to_sign_hash=None, hash_algorithm='SHA256'):
+        if to_sign_hash is None and message is not None:
+            if not isinstance(message, (bytes, bytearray)):
+                raise TypeError("message argument is not a bytes-like object")
+
+            if hash_algorithm is 'SHA256':
+                to_sign_hash = hashlib.sha256(message).digest()
+            else:
+                raise ValueError(f'unsupported hash_algorithm: {hash_algorithm}')
+
+        if to_sign_hash is None:
+            raise ValueError(f'neither message nor to_sign_hash were provided')
+
+        body = {
+            'password': password,
+            'to_sign': str(b64encode(to_sign_hash), "UTF-8"),
+            'output_format': 'int',
+        }
+        rsp = Response(Request().post(auth_instance=self.auth_instance, path=f'{self.path}/sign', body=body))
+        return ECDSASignature(signed_hash=to_sign_hash, j=rsp.data)
 
 class Wallets(object):
     def __init__(self, auth_instance):

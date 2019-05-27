@@ -11,9 +11,6 @@ _CLASSIFIERS = [
     'Intended Audience :: Developers',
     'License :: OSI Approved :: MIT License',
     'Operating System :: OS Independent',
-    'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Topic :: Software Development :: Libraries :: Python Modules',
 ]
@@ -31,7 +28,7 @@ _PACKAGES = setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*",
 
 setuptools.setup(
     name="upvest",
-    version="0.0.1",
+    version="0.0.2",
     author="Upvest GmbH",
     author_email="tech@upvest.co",
     maintainer="Alexander Reichhardt",

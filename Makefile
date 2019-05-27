@@ -5,12 +5,17 @@ export PYTHON = $(VENV)/bin/python3
 export PIP = $(VENV)/bin/pip
 export PYTEST = $(VENV)/bin/pytest
 
-test: deps
+test: test-deps
+ifdef TESTS
+	$(PYTEST) -v -k "$(TESTS)"
+else
 	$(PYTEST) -v
+endif
 
-deps: .requirements.flag
+deps: .requirements.upvest.flag
+test-deps: .requirements.upvest.flag .requirements.test.flag
 
-.requirements.flag: requirements.txt | $(VENV)
+.requirements.%.flag: requirements.%.txt | $(VENV)
 	$(PIP) install -r $<
 	touch $@
 
