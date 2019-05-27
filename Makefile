@@ -22,7 +22,11 @@ test-deps: .requirements.upvest.flag .requirements.test.flag
 $(VENV):
 	$(HOST_PYTHON) -m venv $@
 
-clean:
-	rm -rf $(VENV) .*.flag
+release: .requirements.release.flag
+	$(PYTHON) setup.py sdist bdist_wheel
+	$(VENV)/bin/twine upload dist/*
 
-.PHONY: test deps
+clean:
+	rm -rf $(VENV) .*.flag dist
+
+.PHONY: test deps release clean

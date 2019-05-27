@@ -4,7 +4,7 @@ import setuptools
 _README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
 _REQUIREMENTS = [
-    line.strip() for line in open(os.path.join(os.path.dirname(__file__),'requirements.txt')).readlines()
+    line.strip() for line in open(os.path.join(os.path.dirname(__file__),'requirements.upvest.txt')).readlines()
 ]
 
 _CLASSIFIERS = [
