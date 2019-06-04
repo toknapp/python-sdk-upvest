@@ -71,6 +71,7 @@ def test_send_transaction():
     assert transaction.recipient == '0x6720d291a72b8673e774a179434c96d21eb85e71'
     assert transaction.quantity == 10000000000000000
     assert transaction.fee == 41180000000000
+    assert transaction.status == 'PENDING'
 
 def test_list_transactions():
     """Tests an API call to list transactions"""
