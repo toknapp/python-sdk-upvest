@@ -119,7 +119,7 @@ user = tenancy.users.get('username').update(password='current_password', new_pas
 ```
 ##### Delete a user
 ```python
-tenancy.user.get('username').delete()
+tenancy.users.get('username').delete()
 ```
 
 ### Clientele
@@ -137,7 +137,7 @@ wallet = clientele.wallets.create('asset_id', 'password')
 ```
 ##### Retrieve specific wallet for a user
 ```python
-wallet = clientele.wallet.get('wallet_id')
+wallet = clientele.wallets.get('wallet_id')
 ```
 ##### List all wallets for a user
 ```python
@@ -179,7 +179,7 @@ The business "Blockchain4Everyone", founded by [John](https://en.wikipedia.org/w
 ```python
 # API Keys object
 from upvest.tenancy import UpvestTenancyAPI
-tenancy = UpvestTenancyAPI(API_KEY, API_SECRET, API_PASSPHRASE)
+tenancy = UpvestTenancyAPI(API_KEY, API_SECRET, API_PASSPHRASE, base_url=BASE_URL)
 ```
 
 ### User creation
@@ -193,8 +193,8 @@ After the request, John can access the recovery kit in the user instance and pas
 ### Wallet creation
 After creating an account Jane wants to create an Ethereum wallet on John's platform. In order to do that on behalf of Jane, John needs to initialize an OAuth object with his client credentials and Jane's username and password. After doing so, John can easily create a wallet by providing the respective `asset_id` for Ethereum to the `wallets.create()` function. The `asset_id` can be retrieved via a call to the Upvest asset endpoint, using the clientele or tenancy authentication:
 ```python
-from upvest.tenancy import UpvestClienteleAPI
-clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password)
+from upvest.clientele import UpvestClienteleAPI
+clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, 'Jane Apple','very secret', base_url=BASE_URL)
 
 # List assets and their ids
 asset_id = clientele.assets.all()[i].id
@@ -215,7 +215,7 @@ wallet = wallets_of_jane[i]
 recipient = '0x6720d291A72B8673E774A179434C96D21eb85E71'
 
 # Send the transaction
-transaction = wallet.transactions.create('secret', 'asset_id', 1000000000000000000, 4000000000, 'recipient')
+transaction = wallet.transactions.create('secret', 'asset_id', 1000000000000000000, 4000000000, recipient)
 txhash = transaction.txhash
 ```
 

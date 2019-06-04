@@ -257,6 +257,7 @@ class TransactionInstance(object):
         self.recipient = transaction_attr['recipient']
         self.quantity = int(transaction_attr['quantity'])
         self.fee = int(transaction_attr['fee'])
+        self.status = transaction_attr['status']
 
 class Transactions(object):
     def __init__(self, auth_instance, wallet_id):
