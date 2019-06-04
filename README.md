@@ -91,6 +91,7 @@ transaction.sender
 transaction.recipient
 transaction.quantity
 transaction.fee
+transaction.status
 ```
 
 Usage
