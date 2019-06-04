@@ -1,9 +1,9 @@
-VENV = $(shell readlink -f ./venv)
+VENV := $(shell pwd)/venv
 HOST_PYTHON ?= python3
 
-export PYTHON = $(VENV)/bin/python3
-export PIP = $(VENV)/bin/pip
-export PYTEST = $(VENV)/bin/pytest
+export PYTHON := $(VENV)/bin/python3
+export PIP := $(VENV)/bin/pip
+export PYTEST := $(VENV)/bin/pytest
 
 test: test-deps
 ifdef TESTS
