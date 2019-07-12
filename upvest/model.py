@@ -269,7 +269,6 @@ class Transactions(object):
         # Provide password and asset_id for wallet creation
         body = {
             'password': password,
-            'wallet_id': self.wallet_id,
             'asset_id': asset_id,
             'quantity': str(quantity),
             'fee': str(fee),
