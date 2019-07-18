@@ -28,7 +28,7 @@ class Request(object):
         body = req_params.get('body', None)
         path = req_params.get('path')
         method = req_params.get('method')
-        if body is not None:
+        if body is not None and body != {}:
             for value in body.values():
                 if isinstance(value, int):
                     pass
@@ -51,15 +51,15 @@ class Request(object):
     def post(self, **req_params):
         req_params['method'] = 'POST'
         return self._request(**req_params)
-    
+
     def get(self, **req_params):
         req_params['method'] = 'GET'
         return self._request(**req_params)
-    
+
     def patch(self, **req_params):
         req_params['method'] = 'PATCH'
         return self._request(**req_params)
-    
+
     def delete(self, **req_params):
         req_params['method'] = 'DELETE'
         return self._request(**req_params)

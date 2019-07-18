@@ -37,7 +37,7 @@ def test_change_password():
 def test_deregister_user():
     """Tests an API call to deregister a user"""
     user, _ = create_user()
-    assert tenancy.users.get(user.username).delete() is None
+    assert tenancy.users.get(user.username).delete()
 
 def test_list_assets():
     """Tests an API call to deregister a user"""

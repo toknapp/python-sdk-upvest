@@ -24,8 +24,11 @@ class UserInstance(object):
         return UserInstance(response, username)
 
     def delete(self):
-        # Deregister a user
-        return None
+        response = Response(Request().delete(auth_instance=self.auth_instance, path=self.path + self.username, body=None))
+        return response.status_code == 204
+
+    def __eq__(self, other):
+        return self.username == other.username
 
 class Users(object):
     def __init__(self, auth_instance):

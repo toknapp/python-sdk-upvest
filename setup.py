@@ -16,11 +16,11 @@ _CLASSIFIERS = [
 ]
 
 _KEYWORDS = [
-    'api', 
-    'upvest', 
-    'bitcoin', 
-    'ethereum', 
-    'oauth2', 
+    'api',
+    'upvest',
+    'bitcoin',
+    'ethereum',
+    'oauth2',
     'client',
 ]
 
@@ -28,7 +28,7 @@ _PACKAGES = setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*",
 
 setuptools.setup(
     name="upvest",
-    version="0.0.5",
+    version="0.0.6",
     author="Upvest GmbH",
     author_email="tech@upvest.co",
     maintainer="Alexander Reichhardt",
