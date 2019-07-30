@@ -1,4 +1,5 @@
 from .partials.user_creation import create_user
+from .partials.static_user import static_user
 from .partials.client_instance import create_oauth_client
 from . import fresh
 
@@ -29,7 +30,7 @@ def test_list_wallet():
 
 def test_list_wallets():
     """Tests an API call to list wallets"""
-    clientele = create_oauth_client('alex_test', 'secret')
+    clientele = create_oauth_client(static_user.username, 'secret')
     wallets = clientele.wallets.list(2)
     assert len(wallets) == 2
 
@@ -63,30 +64,31 @@ def test_send_transaction():
         ETHEREUM_ROPSTEN_ASSET_ID,
         10000000000000000,
         41180000000000,
-        '0x6720d291a72b8673e774a179434c96d21eb85e71'
+        '0xf9b44Ba370CAfc6a7AF77D0BDB0d50106823D91b'
     )
     assert transaction.id is not None
     assert transaction.txhash is not None
     assert transaction.sender is not None
-    assert transaction.recipient == '0x6720d291a72b8673e774a179434c96d21eb85e71'
+    assert transaction.recipient == '0xf9b44Ba370CAfc6a7AF77D0BDB0d50106823D91b'
     assert transaction.quantity == 10000000000000000
     assert transaction.fee == 41180000000000
     assert transaction.status == 'PENDING'
 
 def test_list_transactions():
     """Tests an API call to list transactions"""
-    clientele = create_oauth_client('alex_test', 'secret')
-    wallet = clientele.wallets.all()[0]
+    clientele = create_oauth_client(static_user.username, 'secret')
+    wallet = None
+    for w in clientele.wallets.all():
+        if w.protocol == 'ethereum_ropsten':
+            wallet = w
+            break
+    assert wallet is not None, "No ETH wallet found"
     transactions = wallet.transactions.list(8)
     assert len(transactions) == 8
 
-def test_retrieve_transactions():
-    """Tests an API call to list transaction"""
-    clientele = create_oauth_client('alex_test', 'secret')
-    wallet = clientele.wallets.all()[0]
-    id = wallet.transactions.all()[0].id
-    transaction = wallet.transactions.get(id)
-    assert transaction.txhash == '0x029dd84294f4efbc9857a776e2acff0743dec31b8d9e2759872724a80b240e77'
+    tx = transactions[0]
+    fetched = wallet.transactions.get(tx.id)
+    assert tx.txhash == fetched.txhash
 
 def pubkey_to_ethereum_address(pk):
     kec = sha3.keccak_256(pk.x.to_bytes(32, "big") + pk.y.to_bytes(32, "big")).digest()

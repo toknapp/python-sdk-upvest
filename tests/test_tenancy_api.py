@@ -3,6 +3,7 @@ import pytest
 
 from .partials.client_instance import create_tenancy_client
 from .partials.user_creation import create_user
+from .partials.static_user import static_user
 from . import fresh
 
 tenancy = create_tenancy_client()
@@ -16,13 +17,13 @@ def test_register_user():
 
 def test_list_user():
     """Tests an API call to get a specific user"""
-    user = tenancy.users.get('alex_test')
-    assert user.username == 'alex_test'
+    user = tenancy.users.get(static_user.username)
+    assert user.username == static_user.username
 
-def test_list_155_users():
-    """Tests an API call to get a list of usersr"""
-    users = tenancy.users.list(155)
-    assert len(users) == 155
+def test_list_users():
+    """Tests an API call to get a list of users"""
+    users = tenancy.users.list(3)
+    assert len(users) == 3
     assert isinstance(users[0].username, str)
 
 def test_change_password():
