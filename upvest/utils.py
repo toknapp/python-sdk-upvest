@@ -10,8 +10,10 @@ class Response:
     def __init__(self, result):
         self.status_code = result.status_code
         self.raw = result
-        self.json = result.json()
-        self.data = self.json.get("results", self.json)
+        self.data = None
+        if result.content:
+            self.json = result.json()
+            self.data = self.json.get("results", self.json)
 
 
 # Request object
