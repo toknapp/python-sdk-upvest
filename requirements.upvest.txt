@@ -1,2 +1,0 @@
-requests==2.21.0
-environs==4.1.0
