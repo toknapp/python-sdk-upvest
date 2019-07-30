@@ -2,13 +2,11 @@ import time
 import json
 import hmac
 import hashlib
+from urllib.parse import urljoin
 import requests
 
-from upvest.config import ENCODING
-from upvest.config import OAUTH_PATH
-from upvest.config import API_VERSION
-from upvest.config import GRANT_TYPE
-from upvest.config import SCOPE
+from upvest.config import ENCODING, OAUTH_PATH, API_VERSION, GRANT_TYPE, SCOPE
+from upvest.exceptions import InvalidRequest
 
 class KeyAuth(object):
     def __init__(self, api_key=None, api_secret=None, api_passphrase=None, base_url=None, **kwargs):
@@ -59,10 +57,14 @@ class OAuth(object):
             'username': self.username,
             'password': self.password,
         }
+
         # send x-www-form-urlencoded payload to clientele API.
-        r = requests.post(self.base_url + self.path, data=body, headers=headers)
+        req = requests.post(urljoin(self.base_url, self.path), data=body, headers=headers)
+        if req.status_code != 200:
+            raise InvalidRequest()
+
         # Retrieve and return OAuth token
-        oauth_token = r.json()['access_token']
+        oauth_token = req.json()['access_token']
         headers = {
             'Authorization': f'Bearer {oauth_token}',
             'Content-Type': 'application/json',

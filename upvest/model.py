@@ -258,6 +258,7 @@ class TransactionInstance(object):
         self.txhash = transaction_attr['txhash']
         self.sender = transaction_attr['sender']
         self.recipient = transaction_attr['recipient']
+        self.asset_id = transaction_attr['asset_id']
         self.quantity = int(transaction_attr['quantity'])
         self.fee = int(transaction_attr['fee'])
         self.status = transaction_attr['status']
