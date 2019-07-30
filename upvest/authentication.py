@@ -47,7 +47,7 @@ class OAuth:
         self.password = password
         self.base_url = base_url
 
-    def get_headers(self):
+    def get_headers(self, **_):
         # Set header content-type to x-www-form-urlencoded
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         body = {

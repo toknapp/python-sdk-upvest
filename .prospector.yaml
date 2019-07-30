@@ -1,0 +1,10 @@
+doc-warnings: no
+
+pylint:
+  disable:
+     - C0111
+     - too-many-arguments
+
+pep257:
+  disable:
+     - D210

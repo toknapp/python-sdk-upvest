@@ -35,7 +35,7 @@ class Request:
                         raise Exception("Forbidden characters present, please remove")
         # Instantiate the respectively needed auth instance
         auth_instance = req_params.get("auth_instance")
-        authenticated_headers = auth_instance.get_headers()
+        authenticated_headers = auth_instance.get_headers(method=method, path=path, body=body)
         # Execute request with authenticated headers
         request_url = urljoin(auth_instance.base_url, API_VERSION + path)
         response = requests.request(method, request_url, json=body, headers=authenticated_headers)
