@@ -1,34 +1,28 @@
 import os
+
 import setuptools
 
 _VERSION = "0.0.6"
 
-_README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
+_README = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
 
-_INSTALL_REQUIRES = ('requests>=2.21.0,<3', 'environs==4.1.0')
+_INSTALL_REQUIRES = ("requests>=2.21.0,<3", "environs==4.1.0")
 _OPTIONAL_REQUIRES = {
-    'dev': ("pre-commit==1.10.5", "prospector==1.1.6.2"),
-    'test': ('pytest==4.2.0', 'py-ecc==1.7.0', 'pysha3==1.0.2', 'bitcoin==1.1.42')
+    "dev": ("pre-commit==1.10.5", "prospector==1.1.6.2"),
+    "test": ("pytest==4.2.0", "py-ecc==1.7.0", "pysha3==1.0.2", "bitcoin==1.1.42"),
 }
 
 _CLASSIFIERS = [
-    'Development Status :: 4 - Beta',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: MIT License',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python :: 3.7',
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
-    'Topic :: Software Development :: Libraries :: Python Modules',
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-_KEYWORDS = [
-    'api',
-    'upvest',
-    'bitcoin',
-    'ethereum',
-    'oauth2',
-    'client',
-]
+_KEYWORDS = ["api", "upvest", "bitcoin", "ethereum", "oauth2", "client"]
 
 _PACKAGES = setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
 
@@ -49,5 +43,5 @@ setuptools.setup(
     classifiers=_CLASSIFIERS,
     install_requires=_INSTALL_REQUIRES,
     extras_require=_OPTIONAL_REQUIRES,
-    license='MIT',
+    license="MIT",
 )
