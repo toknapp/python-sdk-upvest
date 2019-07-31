@@ -51,7 +51,7 @@ The response objects are designed around users, wallets, transactions and assets
 #### User object
 The user response object has the following properties:
 ```python
-user = tenancy.users.get('mr-foo')
+user = tenancy.users.get('username')
 user.username
 user.recoverykit # is None if not just created
 ```
@@ -152,23 +152,23 @@ wallets = clientele.wallets.list(40)
 #### Transactions
 ##### Create transaction
 ```python
-wallet = clientele.wallets.create('asset_id','secret')
-transaction = wallet.transactions.create('secret', 'asset_id', 'quantity', 'fee', 'recipient')
+wallet = clientele.wallets.create('asset_id','password')
+transaction = wallet.transactions.create('password', 'asset_id', 'quantity', 'fee', 'recipient')
 ```
 #### Retrieve specific transaction
 ```python
-wallet = clientele.wallets.create('asset_id','secret')
+wallet = clientele.wallets.create('asset_id','password')
 id = wallet.transactions.all()[i].id
 transaction = wallet.transactions.get(id)
 ```
 ##### List all transactions of a wallet for a user
 ```python
-wallet = clientele.wallets.create('asset_id','secret')
+wallet = clientele.wallets.create('asset_id','password')
 transactions = wallet.transactions.all()
 ```
 ##### List a specific number of transactions of a wallet for a user
 ```python
-wallet = clientele.wallets.create('asset_id','secret')
+wallet = clientele.wallets.create('asset_id','password')
 transactions = wallet.transactions.list(8)
 ```
 
@@ -202,7 +202,7 @@ asset_id = clientele.assets.all()[i].id
 asset_id = tenancy.assets.all()[i].id
 
 # Create a wallet for Jane on Ethereum with her password and the respective asset_id
-ethereum_wallet = clientele.wallets.create(asset_id, 'very_secret')
+ethereum_wallet = clientele.wallets.create(asset_id, 'very secret')
 wallet_address = ethereum_wallet.address
 ```
 Using the address, Jane is now able to receive funds in her Ethereum wallet on John's platform. Thus she sends Ethereumfrom her current Ethereum wallet provider and sends the funds to her newly created wallet on John's platform.
@@ -212,11 +212,11 @@ After a couple of days, Jane would like to buy a new road bike, paying with Ethe
 ```python
 # Retrieve Jane's wallet_id
 wallets_of_jane = clientele.wallets.all()
-wallet = wallets_of_jane[i]
+wallet = wallets_of_jane[0]
 recipient = '0x6720d291A72B8673E774A179434C96D21eb85E71'
 
 # Send the transaction
-transaction = wallet.transactions.create('secret', 'asset_id', 1000000000000000000, 4000000000, recipient)
+transaction = wallet.transactions.create('very secret', 'asset_id', 1000000000000000000, 4000000000, recipient)
 txhash = transaction.txhash
 ```
 
