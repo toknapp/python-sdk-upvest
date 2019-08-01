@@ -42,7 +42,7 @@ class Request:
         request_url = urljoin(auth_instance.base_url, API_VERSION + path)
         response = requests.request(method, request_url, json=body, headers=authenticated_headers)
         if response.status_code >= 300:
-            raise InvalidRequest(response.text)
+            raise InvalidRequest(response)
         else:
             return response
 

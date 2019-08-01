@@ -60,11 +60,11 @@ class OAuth:
         }
 
         # send x-www-form-urlencoded payload to clientele API.
-        req = requests.post(urljoin(self.base_url, self.path), data=body, headers=headers)
-        if req.status_code >= 300:
-            raise InvalidRequest(req.text)
+        response = requests.post(urljoin(self.base_url, self.path), data=body, headers=headers)
+        if response.status_code >= 300:
+            raise InvalidRequest(response)
 
         # Retrieve and return OAuth token
-        oauth_token = req.json()["access_token"]
+        oauth_token = response.json()["access_token"]
         headers = {"Authorization": f"Bearer {oauth_token}", "Content-Type": "application/json"}
         return headers
