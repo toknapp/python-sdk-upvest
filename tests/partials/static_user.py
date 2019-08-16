@@ -19,14 +19,6 @@ def _make_static_user():
     clientele.wallets.create("a3c18f74-935e-5d75-bd3c-ce0fb5464414", "secret")  # BTC
     eth_wallet = clientele.wallets.create("deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f", "secret")
 
-    for _ in range(8):
-        eth_wallet.transactions.create(
-            "secret",
-            "deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f",
-            10000000000000000,
-            41180000000000,
-            "0xf9b44Ba370CAfc6a7AF77D0BDB0d50106823D91b",
-        )
     return user
 
 

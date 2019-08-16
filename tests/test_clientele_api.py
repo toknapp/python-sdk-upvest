@@ -1,10 +1,9 @@
 import hashlib
-from binascii import hexlify
-
+import ethereum.utils
 import bitcoin
 import sha3
 from py_ecc.secp256k1 import ecdsa_raw_recover
-
+from binascii import hexlify
 from . import fresh
 from .partials.client_instance import create_oauth_client
 from .partials.static_user import static_user
@@ -62,44 +61,9 @@ def test_list_assets():
     assert assets[0].exponent == 12
     assert assets[0].protocol == "arweave_testnet"
 
-
-def test_send_transaction():
-    """Tests an API call to send transactions"""
-    user, pw = create_user()
-    clientele = create_oauth_client(user.username, pw)
-    wallet = clientele.wallets.create(ETHEREUM_ROPSTEN_ASSET_ID, pw)
-    transaction = wallet.transactions.create(
-        pw, ETHEREUM_ROPSTEN_ASSET_ID, 10000000000000000, 41180000000000, "0xf9b44Ba370CAfc6a7AF77D0BDB0d50106823D91b"
-    )
-    assert transaction.id is not None
-    assert transaction.txhash is not None
-    assert transaction.sender is not None
-    assert transaction.recipient == "0xf9b44Ba370CAfc6a7AF77D0BDB0d50106823D91b"
-    assert transaction.quantity == 10000000000000000
-    assert transaction.fee == 41180000000000
-    assert transaction.status == "PENDING"
-
-
-def test_list_transactions():
-    """Tests an API call to list transactions"""
-    clientele = create_oauth_client(static_user.username, "secret")
-    wallet = None
-    for w in clientele.wallets.all():
-        if w.protocol == "ethereum_ropsten":
-            wallet = w
-            break
-    assert wallet is not None, "No ETH wallet found"
-    transactions = wallet.transactions.list(8)
-    assert len(transactions) == 8
-
-    tx = transactions[0]
-    fetched = wallet.transactions.get(tx.id)
-    assert tx.txhash == fetched.txhash
-
-
 def pubkey_to_ethereum_address(pk):
     kec = sha3.keccak_256(pk.x.to_bytes(32, "big") + pk.y.to_bytes(32, "big")).digest()
-    return "0x" + str(hexlify(kec[-20:]), "UTF-8")
+    return ethereum.utils.checksum_encode(kec[-20:])
 
 
 def pubkey_to_bitcoin_address(pk, prefix):
