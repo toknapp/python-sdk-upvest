@@ -1,7 +1,7 @@
 Upvest Python SDK
 =================
 
-[![CircleCI](https://circleci.com/gh/toknapp/python-sdk-upvest/tree/master.svg?style=svg)](https://circleci.com/gh/toknapp/python-sdk-upvest/tree/master)
+[![CircleCI](https://circleci.com/gh/upvestco/upvest-python.svg?style=svg)](https://circleci.com/gh/upvestco/upvest-python)
 [![PyPI version](https://img.shields.io/pypi/v/upvest.svg)](https://pypi.org/project/upvest/)
 [![Supported Python versions](https://img.shields.io/pypi/pyversions/upvest.svg)](https://pypi.org/project/upvest/)
 
