@@ -2,7 +2,10 @@ import os
 
 import setuptools
 
-_VERSION = "0.0.7"
+with open("upvest/__pkginfo__.py") as f:
+    exec(f.read())
+_VERSION = globals()["__version__"]
+
 
 _README = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
 

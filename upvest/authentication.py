@@ -3,6 +3,7 @@ import hmac
 import json
 import time
 from urllib.parse import urljoin
+from upvest.__pkginfo__ import DEFAULT_USERAGENT
 
 import requests
 
@@ -11,11 +12,12 @@ from upvest.exceptions import InvalidRequest
 
 
 class KeyAuth:
-    def __init__(self, api_key=None, api_secret=None, api_passphrase=None, base_url=None):
+    def __init__(self, api_key=None, api_secret=None, api_passphrase=None, base_url=None, user_agent=None):
         self.api_key = api_key
         self.api_secret = api_secret
         self.api_passphrase = api_passphrase
         self.base_url = base_url
+        self.user_agent = user_agent or DEFAULT_USERAGENT
 
     def get_headers(self, method=None, path=None, body=None):
         body = json.dumps(body) if body else None
@@ -39,13 +41,16 @@ class KeyAuth:
 
 
 class OAuth:
-    def __init__(self, client_id=None, client_secret=None, username=None, password=None, base_url=None):
+    def __init__(
+        self, client_id=None, client_secret=None, username=None, password=None, base_url=None, user_agent=None
+    ):
         self.path = API_VERSION + OAUTH_PATH
         self.client_id = client_id
         self.client_secret = client_secret
         self.username = username
         self.password = password
         self.base_url = base_url
+        self.user_agent = user_agent or DEFAULT_USERAGENT
 
     def get_headers(self, **_):
         # Set header content-type to x-www-form-urlencoded
