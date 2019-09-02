@@ -48,12 +48,12 @@ class Users:
         response = Response(Request().post(auth_instance=self.auth_instance, path=self.path, body=body))
         username = response.data["username"]
         recovery_kit = response.data["recoverykit"]
-        return UserInstance(self.auth_instance, username, recovery_kit)
+        return UserInstance(self.auth_instance, username, recovery_kit=recovery_kit)
 
     def get(self, username):
         response = Response(Request().get(auth_instance=self.auth_instance, path=self.path + username))
         username = response.data["username"]
-        return UserInstance(self.auth_instance, username)
+        return UserInstance(self.auth_instance, username, wallets=response.data["wallets"])
 
     def list(self, count):
         # Retrieve subset of users
@@ -65,7 +65,7 @@ class Users:
         while listed_count < count:
             response = Response(Request().get(auth_instance=self.auth_instance, path=path))
             for user in response.data:
-                array_of_users.append(UserInstance(self.auth_instance, user["username"], user["wallets"]))
+                array_of_users.append(UserInstance(self.auth_instance, user["username"], wallets=user["wallets"]))
                 listed_count += 1
                 if listed_count >= count:
                     break
@@ -89,7 +89,7 @@ class Users:
         while True:
             response = Response(Request().get(auth_instance=self.auth_instance, path=path))
             for user in response.data:
-                array_of_users.append(UserInstance(self.auth_instance, user["username"], user["wallets"]))
+                array_of_users.append(UserInstance(self.auth_instance, user["username"], wallets=user["wallets"]))
             if response.raw.json()["next"]:
                 path = response.raw.json()["next"].split(API_VERSION)[-1]
                 path_parts = list(urlsplit(path))
