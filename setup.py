@@ -2,7 +2,7 @@ import os
 
 import setuptools
 
-_VERSION = "0.0.6.2"
+_VERSION = "0.0.7"
 
 _README = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
 
@@ -37,7 +37,7 @@ setuptools.setup(
     keywords=_KEYWORDS,
     long_description=_README,
     long_description_content_type="text/markdown",
-    url="https://github.com/toknapp/python-sdk-upvest/",
+    url="https://github.com/upvestco/upvest-python/",
     packages=_PACKAGES,
     include_package_data=True,
     classifiers=_CLASSIFIERS,
