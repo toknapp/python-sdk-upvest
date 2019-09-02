@@ -8,11 +8,15 @@ from upvest.utils import Request, Response
 
 # Endpoint related objects
 class UserInstance:
-    def __init__(self, auth_instance, username, recovery_kit=None):
+    def __init__(self, auth_instance, username, wallets=None, recovery_kit=None):
         self.path = "/tenancy/users/"
         self.auth_instance = auth_instance
         self.username = username
         self.recovery_kit = recovery_kit
+        if wallets is None:
+            self.wallets = []
+        else:
+            self.wallets = [WalletInstance(auth_instance, **w) for w in wallets]
 
     def update(self, password, new_password):
         # Provide current and new password
@@ -61,8 +65,7 @@ class Users:
         while listed_count < count:
             response = Response(Request().get(auth_instance=self.auth_instance, path=path))
             for user in response.data:
-                username = user["username"]
-                array_of_users.append(UserInstance(self.auth_instance, username))
+                array_of_users.append(UserInstance(self.auth_instance, user["username"], user["wallets"]))
                 listed_count += 1
                 if listed_count >= count:
                     break
@@ -86,8 +89,7 @@ class Users:
         while True:
             response = Response(Request().get(auth_instance=self.auth_instance, path=path))
             for user in response.data:
-                username = user["username"]
-                array_of_users.append(UserInstance(self.auth_instance, username))
+                array_of_users.append(UserInstance(self.auth_instance, user["username"], user["wallets"]))
             if response.raw.json()["next"]:
                 path = response.raw.json()["next"].split(API_VERSION)[-1]
                 path_parts = list(urlsplit(path))
