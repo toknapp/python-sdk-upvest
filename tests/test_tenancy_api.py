@@ -1,9 +1,13 @@
 import uuid
 
+import pytest
+
 from . import fresh
 from .partials.client_instance import create_tenancy_client
 from .partials.static_user import static_user
 from .partials.user_creation import create_user
+
+from upvest.exceptions import AuthenticationError
 
 tenancy = create_tenancy_client()
 
@@ -11,6 +15,14 @@ tenancy = create_tenancy_client()
 def test_echo():
     """Tests the echo API"""
     tenancy.check_auth()
+
+
+def test_auth_fail():
+    """Tests the echo API"""
+    tenancy = create_tenancy_client()
+    tenancy.auth_instance.api_secret = "nope"
+    with pytest.raises(AuthenticationError):
+        tenancy.check_auth()
 
 
 def test_register_user():

@@ -1,7 +1,7 @@
 from upvest.authentication import OAuth
 from upvest.config import UPVEST_API_TARGET
 from upvest.model import Assets, Wallets
-from upvest.utils import Request, Response, verify_echo
+from upvest.utils import verify_echo
 
 
 class UpvestClienteleAPI:

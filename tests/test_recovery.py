@@ -5,7 +5,6 @@ from upvest.config import PRIVATE_KEY_BASE64
 
 from . import fresh
 from .partials.client_instance import create_tenancy_client, create_oauth_client
-from .partials.user_creation import create_user
 from .test_clientele_api import ETHEREUM_ROPSTEN_ASSET_ID
 
 tenancy = create_tenancy_client()

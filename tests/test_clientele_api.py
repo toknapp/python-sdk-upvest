@@ -1,13 +1,15 @@
 import hashlib
 import ethereum.utils
 import bitcoin
+import pytest
 import sha3
 from py_ecc.secp256k1 import ecdsa_raw_recover
-from binascii import hexlify
 from . import fresh
 from .partials.client_instance import create_oauth_client
 from .partials.static_user import static_user
 from .partials.user_creation import create_user
+
+from upvest.exceptions import AuthenticationError
 
 ETHEREUM_ROPSTEN_ASSET_ID = "deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f"
 BITCOIN_TESTNET_ASSET_ID = "a3c18f74-935e-5d75-bd3c-ce0fb5464414"
@@ -18,6 +20,14 @@ def test_echo():
     user, pw = create_user()
     clientele = create_oauth_client(user.username, pw)
     clientele.check_auth()
+
+
+def test_auth_fail():
+    """Tests the echo API"""
+    user, pw = create_user()
+    clientele = create_oauth_client(user.username, pw + "nope")
+    with pytest.raises(AuthenticationError):
+        clientele.check_auth()
 
 
 def test_create_wallet():

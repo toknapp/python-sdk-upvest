@@ -75,7 +75,14 @@ def verify_echo(auth_instance, path):
     body = {"echo": "test"}
     try:
         resp = Response(Request().post(auth_instance=auth_instance, path=path, body=body))
-    except InvalidRequest:
-        raise AuthenticationError("API error")
+    except InvalidRequest as e:
+        if hasattr(e.args[0], "status_code") and e.args[0].status_code in (401, 403):
+            raise AuthenticationError("Unauthorized/Forbidden")
+
+        if isinstance(e.args[0], str) and json.loads(e.args[0])["error"] == "invalid_grant":
+            raise AuthenticationError("Invalid grant")
+
+        # Other, unexpected error
+        raise
     if resp.data["echo"] != "test":
         raise AuthenticationError("Unexpected echo response")
