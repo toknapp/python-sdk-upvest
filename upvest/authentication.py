@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import json
 import time
 from urllib.parse import urljoin
 from upvest.__pkginfo__ import DEFAULT_USERAGENT
@@ -19,8 +18,7 @@ class KeyAuth:
         self.base_url = base_url
         self.user_agent = user_agent or DEFAULT_USERAGENT
 
-    def get_headers(self, method=None, path=None, body=None):
-        body = json.dumps(body) if body else None
+    def get_headers(self, method, path, body=None):
         timestamp = str(int(time.time()))
         # Compose the message as a concatenation of all info we are sending along with the request
         message = timestamp + method + API_VERSION + path + (body or "")

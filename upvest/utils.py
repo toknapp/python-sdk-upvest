@@ -1,3 +1,4 @@
+import json
 from urllib.parse import urljoin
 
 import requests
@@ -21,27 +22,33 @@ class Request:
     def __init__(self):
         pass
 
-    def _request(self, **req_params):
-        # Set request parameters
-        body = req_params.get("body", None)
-        path = req_params.get("path")
-        method = req_params.get("method")
-        if body is not None and body != {}:
-            for value in body.values():
-                if isinstance(value, int):
-                    pass
-                else:
-                    try:
-                        value.encode("ascii")
-                    except UnicodeEncodeError:
-                        raise Exception("Forbidden characters present, please remove")
+    def _check(self, value):
+        if isinstance(value, int):
+            pass
+        elif isinstance(value, str):
+            try:
+                value.encode("ascii")
+            except UnicodeEncodeError:
+                raise ValueError("Forbidden characters present, please remove")
+        elif isinstance(value, dict):
+            for val in value.values():
+                self._check(val)
+        elif isinstance(value, list):
+            for val in value:
+                self._check(val)
+        else:
+            raise ValueError("no valid JSON structure given")
+
+    def _request(self, auth_instance, method, path, body=None):
+        if body is not None:
+            self._check(body)
+            body = json.dumps(body)
         # Instantiate the respectively needed auth instance
-        auth_instance = req_params.get("auth_instance")
         authenticated_headers = auth_instance.get_headers(method=method, path=path, body=body)
         authenticated_headers["User-Agent"] = auth_instance.user_agent
         # Execute request with authenticated headers
         request_url = urljoin(auth_instance.base_url, API_VERSION + path)
-        response = requests.request(method, request_url, json=body, headers=authenticated_headers)
+        response = requests.request(method, request_url, data=body, headers=authenticated_headers)
         if response.status_code >= 300:
             raise InvalidRequest(response)
         else:
