@@ -5,3 +5,7 @@ class InvalidRequest(Exception):
 
 class RecoveryFailedError(Exception):
     pass
+
+
+class AuthenticationError(Exception):
+    pass

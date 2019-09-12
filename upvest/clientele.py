@@ -1,6 +1,7 @@
 from upvest.authentication import OAuth
 from upvest.config import UPVEST_API_TARGET
 from upvest.model import Assets, Wallets
+from upvest.utils import Request, Response, verify_echo
 
 
 class UpvestClienteleAPI:
@@ -16,3 +17,6 @@ class UpvestClienteleAPI:
         )
         self.assets = Assets(self.auth_instance)
         self.wallets = Wallets(self.auth_instance)
+
+    def check_auth(self):
+        verify_echo(self.auth_instance, "/clientele/echo-oauth2")

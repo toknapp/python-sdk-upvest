@@ -13,6 +13,13 @@ ETHEREUM_ROPSTEN_ASSET_ID = "deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f"
 BITCOIN_TESTNET_ASSET_ID = "a3c18f74-935e-5d75-bd3c-ce0fb5464414"
 
 
+def test_echo():
+    """Tests the echo API"""
+    user, pw = create_user()
+    clientele = create_oauth_client(user.username, pw)
+    clientele.check_auth()
+
+
 def test_create_wallet():
     """Tests an API call to create a wallet"""
     user, pw = create_user()

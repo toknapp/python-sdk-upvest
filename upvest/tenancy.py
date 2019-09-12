@@ -8,7 +8,7 @@ from upvest.config import UPVEST_API_TARGET
 from upvest.exceptions import RecoveryFailedError
 from upvest.model import Assets, Users
 from upvest.proto import RecoveryKit
-from upvest.utils import Request, Response
+from upvest.utils import Request, Response, verify_echo
 
 
 class UpvestTenancyAPI:
@@ -23,6 +23,9 @@ class UpvestTenancyAPI:
         )
         self.users = Users(self.auth_instance)
         self.assets = Assets(self.auth_instance)
+
+    def check_auth(self):
+        verify_echo(self.auth_instance, "/tenancy/echo-signed")
 
     def recover_with_seed(self, seed, seedhash, user_id, password):
         path = "/tenancy/recover/"

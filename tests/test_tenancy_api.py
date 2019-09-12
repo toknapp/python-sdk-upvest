@@ -8,6 +8,11 @@ from .partials.user_creation import create_user
 tenancy = create_tenancy_client()
 
 
+def test_echo():
+    """Tests the echo API"""
+    tenancy.check_auth()
+
+
 def test_register_user():
     """Tests an API call to create a user"""
     username = f"upvest_test_{uuid.uuid4()}"

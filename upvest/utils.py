@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 import requests
 
 from upvest.config import API_VERSION
-from upvest.exceptions import InvalidRequest
+from upvest.exceptions import InvalidRequest, AuthenticationError
 
 
 class Response:
@@ -69,3 +69,13 @@ class Request:
     def delete(self, **req_params):
         req_params["method"] = "DELETE"
         return self._request(**req_params)
+
+
+def verify_echo(auth_instance, path):
+    body = {"echo": "test"}
+    try:
+        resp = Response(Request().post(auth_instance=auth_instance, path=path, body=body))
+    except InvalidRequest:
+        raise AuthenticationError("API error")
+    if resp.data["echo"] != "test":
+        raise AuthenticationError("Unexpected echo response")
