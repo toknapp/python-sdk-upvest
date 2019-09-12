@@ -50,7 +50,14 @@ class OAuth:
         self.base_url = base_url
         self.user_agent = user_agent or DEFAULT_USERAGENT
 
-    def get_headers(self, **_):
+        self.access_token = None
+        self.access_token_expiry = None
+
+    def get_token(self):
+        # allow for some clock drift
+        if self.access_token and time.time() < self.access_token_expiry - 3600:
+            return self.access_token
+
         # Set header content-type to x-www-form-urlencoded
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         body = {
@@ -68,6 +75,10 @@ class OAuth:
             raise InvalidRequest(response)
 
         # Retrieve and return OAuth token
-        oauth_token = response.json()["access_token"]
-        headers = {"Authorization": f"Bearer {oauth_token}", "Content-Type": "application/json"}
-        return headers
+        resp_json = response.json()
+        self.access_token = resp_json["access_token"]
+        self.access_token_expiry = time.time() + resp_json["expires_in"]
+        return self.access_token
+
+    def get_headers(self, **_):
+        return {"Authorization": f"Bearer {self.get_token()}", "Content-Type": "application/json"}
