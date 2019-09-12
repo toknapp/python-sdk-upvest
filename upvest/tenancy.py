@@ -30,8 +30,8 @@ class UpvestTenancyAPI:
         # Set username and password for the user
         body = {"seed": seed, "seedhash": seedhash, "user_id": user_id, "password": password}
         response = Response(Request().post(auth_instance=self.auth_instance, path=path, body=body))
-        if not response.data['success']:
-            raise RecoveryFailedError('Recovery unsuccessful')
+        if not response.data["success"]:
+            raise RecoveryFailedError("Recovery unsuccessful")
 
     def recover(self, recovery_kit_base64, private_key_base64, new_password):
         cipher = base64.b64decode(recovery_kit_base64)
@@ -44,9 +44,4 @@ class UpvestTenancyAPI:
 
         seed = MessageToDict(kit.seed, including_default_value_fields=True)
 
-        self.recover_with_seed(
-            seed=seed,
-            seedhash=kit.seedhash,
-            user_id=kit.user_id,
-            password=new_password
-        )
+        self.recover_with_seed(seed=seed, seedhash=kit.seedhash, user_id=kit.user_id, password=new_password)
