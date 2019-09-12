@@ -42,9 +42,14 @@ class Users:
         self.path = "/tenancy/users/"
         self.auth_instance = auth_instance
 
-    def create(self, username, password):
+    def create(self, username, password, raw_recovery_kit=False, asset_ids=None):
         # Set username and password for the user
-        body = {"username": username, "password": password}
+        body = {
+            "username": username,
+            "password": password,
+            "raw": raw_recovery_kit,
+            "asset_ids": asset_ids or [],
+        }
         response = Response(Request().post(auth_instance=self.auth_instance, path=self.path, body=body))
         username = response.data["username"]
         recovery_kit = response.data["recoverykit"]
