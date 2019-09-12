@@ -7,3 +7,4 @@ GRANT_TYPE = "password"
 SCOPE = "read write echo transaction"
 
 UPVEST_API_TARGET = os.getenv("UPVEST_API_TARGET", default="https://api.playground.upvest.co/")
+PRIVATE_KEY_BASE64 = os.getenv("PRIVATE_KEY_BASE64")

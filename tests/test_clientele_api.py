@@ -68,6 +68,7 @@ def test_list_assets():
     assert assets[0].exponent == 12
     assert assets[0].protocol == "arweave_testnet"
 
+
 def pubkey_to_ethereum_address(pk):
     kec = sha3.keccak_256(pk.x.to_bytes(32, "big") + pk.y.to_bytes(32, "big")).digest()
     return ethereum.utils.checksum_encode(kec[-20:])
