@@ -1,13 +1,9 @@
 import base64
 
-from google.protobuf.json_format import MessageToDict
-from nacl.public import PrivateKey, SealedBox
-
 from upvest.authentication import KeyAuth
 from upvest.config import UPVEST_API_TARGET
 from upvest.exceptions import RecoveryFailedError
 from upvest.model import Assets, Users
-from upvest.proto import RecoveryKit
 from upvest.utils import Request, Response, verify_echo
 
 
@@ -37,6 +33,13 @@ class UpvestTenancyAPI:
             raise RecoveryFailedError("Recovery unsuccessful")
 
     def recover(self, recovery_kit_base64, private_key_base64, new_password):
+        try:
+            from google.protobuf.json_format import MessageToDict
+            from nacl.public import PrivateKey, SealedBox
+            from upvest.proto import RecoveryKit
+        except ImportError:
+            raise Exception("Please install via pip install upvest[recovery]")
+
         cipher = base64.b64decode(recovery_kit_base64)
 
         pk = PrivateKey(base64.b64decode(private_key_base64))
