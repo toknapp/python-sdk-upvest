@@ -37,7 +37,7 @@ class UpvestTenancyAPI:
             from google.protobuf.json_format import MessageToDict
             from nacl.public import PrivateKey, SealedBox
             from upvest.proto import RecoveryKit
-        except ImportError:
+        except (ImportError, ModuleNotFoundError):
             raise Exception("Please install via pip install upvest[recovery]")
 
         cipher = base64.b64decode(recovery_kit_base64)
