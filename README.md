@@ -12,6 +12,14 @@ The Upvest SDK is available on [PYPI](https://pypi.org/project/upvest/). Install
 pip install upvest
 ```
 
+The default SDK is lightweight, and user recovery kits are returned as an SVG in string format. If you wish to process the recovery kit in binary format, then additional requirements are necessary:
+
+```python
+pip install upvest[recovery]
+```
+
+Note that this may require additional system level dependencies to support [PyNaCl](https://pypi.org/project/PyNaCl/).
+
 Documentation
 ------
 In order to retrieve your API credentials for using this Python client, you'll need to [sign up with Upvest](https://login.upvest.co/sign-up).
