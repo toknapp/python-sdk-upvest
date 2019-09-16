@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run:
           name: Installing Python dependencies
-          command: pip install .[test]
+          command: pip install .[test] --progress-bar off
       - run:
           name: Provide an .env:ironment
           command: base64 -d <<< "$PLAYGROUND_ENV" > .env
