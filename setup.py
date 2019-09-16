@@ -13,6 +13,7 @@ _INSTALL_REQUIRES = ("requests>=2.21.0,<3", "environs==4.1.0")
 _OPTIONAL_REQUIRES = {
     "dev": ("pre-commit==1.10.5", "prospector==1.1.6.2"),
     "test": ("pytest==4.2.0", "py-ecc==1.7.0", "pysha3==1.0.2", "bitcoin==1.1.42", "ethereum==2.3.2"),
+    "recovery": ("protobuf>=3.9.1", "PyNaCl>=1.3.0"),
 }
 
 _CLASSIFIERS = [
