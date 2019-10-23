@@ -101,6 +101,9 @@ ENV/
 env.txt
 env.bak/
 venv.bak/
+# until team-wide adopted, ignore pipenv
+Pipfile
+Pipfile.lock
 
 # Spyder project settings
 .spyderproject
@@ -122,3 +125,6 @@ dmypy.json
 
 # flags
 .*.flag
+
+# personal dev NOTES
+NOTES
