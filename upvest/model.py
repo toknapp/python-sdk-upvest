@@ -1,3 +1,4 @@
+import http
 import hashlib
 from base64 import b64encode
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
@@ -341,3 +342,100 @@ class Transactions:
             else:
                 break
         return array_of_transactions
+
+
+class WebhookInstance:
+    def __init__(self, auth_instance, **webhook_attr):
+        self.auth_instance = auth_instance
+        self.id = webhook_attr["id"]
+        self.url = webhook_attr["url"]
+        self.hmac_secret_key = webhook_attr["hmac_secret_key"]
+        self.headers = webhook_attr["headers"]
+        self.version = webhook_attr["version"]
+        self.status = webhook_attr["status"]
+        self.event_filters = webhook_attr["event_filters"]
+
+
+class Webhooks:
+    def __init__(self, tenancy_auth_instance):
+        self.auth = tenancy_auth_instance
+        self.path = "/tenancy/webhooks/"
+
+    def create(self, url, hmac_secret_key, version, status, event_filters, headers=None):
+        body = {
+            "url": url,
+            "hmac_secret_key": hmac_secret_key,
+            "headers": headers or {},
+            "version": version,
+            "status": status,
+            "event_filters": event_filters,
+        }
+        response = Response(Request().post(auth_instance=self.auth, path=self.path, body=body))
+        return response.status_code == http.HTTPStatus.CREATED
+
+    def get(self, webhook_id):
+        response = Response(Request().get(auth_instance=self.auth, path=f"{self.path}{webhook_id}"))
+        return WebhookInstance(self.auth, **response.data)
+
+    def delete(self, webhook_id):
+        response = Response(Request().delete(auth_instance=self.auth, path=f"{self.path}{webhook_id}"))
+        return response.status_code == http.HTTPStatus.NO_CONTENT
+
+    def update(self, webhook_id, url, hmac_secret_key, version, status, event_filters, headers=None):
+        body = {
+            "url": url,
+            "headers": headers or {},
+            "version": version,
+            "status": status,
+            "hmac_secret_key": hmac_secret_key,
+            "event_filters": event_filters,
+        }
+        response = Response(Request().patch(auth_instance=self.auth, path=f"{self.path}{webhook_id}", body=body))
+        return response.status_code == http.HTTPStatus.OK
+
+    def list(self, count):
+        # Retrieve subset of webhooks
+        MAX_PAGE_SIZE = 100
+        array_of_webhooks = []
+        path = f"{self.path}?page_size={MAX_PAGE_SIZE}"
+        listed_count = 0
+
+        while listed_count < count:
+            response = Response(Request().get(auth_instance=self.auth, path=path))
+            for webhook in response.data:
+                array_of_webhooks.append(WebhookInstance(self.auth, **webhook))
+                listed_count += 1
+                if listed_count >= count:
+                    break
+            if response.raw.json()["next"]:
+                page_size = min(MAX_PAGE_SIZE, count - listed_count)
+                path = response.raw.json()["next"].split(API_VERSION)[-1]
+                path_parts = list(urlsplit(path))
+                query = parse_qs(path_parts[3])
+                query["page_size"] = [page_size]
+                path_parts[3] = urlencode(query, doseq=True)
+                path = urlunsplit(path_parts)
+            else:
+                break
+        return array_of_webhooks
+
+    def all(self):
+        # Retrieve subset of webhooks
+        MAX_PAGE_SIZE = 100
+        array_of_webhooks = []
+        path = f"{self.path}?page_size={MAX_PAGE_SIZE}"
+
+        while True:
+            response = Response(Request().get(auth_instance=self.auth, path=path))
+            for webhook in response.data:
+                array_of_webhooks.append(WebhookInstance(self.auth, **webhook))
+            if response.raw.json()["next"]:
+                path = response.raw.json()["next"].split(API_VERSION)[-1]
+                path_parts = list(urlsplit(path))
+                query = parse_qs(path_parts[3])
+                query["page_size"] = [MAX_PAGE_SIZE]
+                path_parts[3] = urlencode(query, doseq=True)
+                path = urlunsplit(path_parts)
+            else:
+                break
+        return array_of_webhooks
