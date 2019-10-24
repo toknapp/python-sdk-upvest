@@ -357,8 +357,8 @@ class WebhookInstance:
 
 
 class Webhooks:
-    def __init__(self, tenancy_auth_instance):
-        self.auth = tenancy_auth_instance
+    def __init__(self, auth_instance):
+        self.auth = auth_instance
         self.path = "/tenancy/webhooks/"
 
     def create(self, url, hmac_secret_key, version, status, event_filters, headers=None):
@@ -380,18 +380,6 @@ class Webhooks:
     def delete(self, webhook_id):
         response = Response(Request().delete(auth_instance=self.auth, path=f"{self.path}{webhook_id}"))
         return response.status_code == http.HTTPStatus.NO_CONTENT
-
-    def update(self, webhook_id, url, hmac_secret_key, version, status, event_filters, headers=None):
-        body = {
-            "url": url,
-            "headers": headers or {},
-            "version": version,
-            "status": status,
-            "hmac_secret_key": hmac_secret_key,
-            "event_filters": event_filters,
-        }
-        response = Response(Request().patch(auth_instance=self.auth, path=f"{self.path}{webhook_id}", body=body))
-        return response.status_code == http.HTTPStatus.OK
 
     def list(self, count):
         # Retrieve subset of webhooks
