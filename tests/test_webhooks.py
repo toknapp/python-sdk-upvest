@@ -17,9 +17,11 @@ dummy_webhook = {
     "hmac_secret_key": "abcdef",
 }
 
+
 def test_webhook_verify():
-    is_verified = tenancy.webhooks.verify(webhook_url)
+    is_verified = tenancy.webhooks.verify(webhook_verification_url)
     assert is_verified
+
 
 def test_create_webhook():
     """Tests an API call to create a webhook"""

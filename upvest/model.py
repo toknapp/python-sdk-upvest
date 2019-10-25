@@ -361,7 +361,7 @@ class Webhooks:
     def __init__(self, auth_instance):
         self.auth = auth_instance
         self.path = "/tenancy/webhooks/"
-        self.path = "/tenancy/webhooks-verify/"
+        self.path_verify = "/tenancy/webhooks-verify/"
 
     def verify(self, url):
         body = {"verify_url": url}
