@@ -349,6 +349,7 @@ class WebhookInstance:
         self.auth_instance = auth_instance
         self.id = webhook_attr["id"]
         self.url = webhook_attr["url"]
+        self.name = webhook_attr["name"]
         self.hmac_secret_key = webhook_attr["hmac_secret_key"]
         self.headers = webhook_attr["headers"]
         self.version = webhook_attr["version"]
@@ -360,10 +361,17 @@ class Webhooks:
     def __init__(self, auth_instance):
         self.auth = auth_instance
         self.path = "/tenancy/webhooks/"
+        self.path = "/tenancy/webhooks-verify/"
 
-    def create(self, url, hmac_secret_key, version, status, event_filters, headers=None):
+    def verify(self, url):
+        body = {"verify_url": url}
+        resp = Response(Request().post(auth_instance=self.auth, path=self.path_verify, body=body))
+        return resp.status_code == 201
+
+    def create(self, url, name, hmac_secret_key, version, status, event_filters, headers=None):
         body = {
             "url": url,
+            "name": name,
             "hmac_secret_key": hmac_secret_key,
             "headers": headers or {},
             "version": version,

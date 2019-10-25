@@ -1,10 +1,15 @@
+import os
+
 from .partials.client_instance import create_tenancy_client
 
 tenancy = create_tenancy_client()
 
+webhook_url = os.getenv("WEBHOOK_URL", "")
+webhook_verification_url = os.getenv("WEBHOOK_VERIFICATION_URL", "")
 
 dummy_webhook = {
-    "url": "https://upvest-raphael-flexapp.appspot.com/webhook/platitude--raphael-local-generic--tenant-1",
+    "url": webhook_url,
+    "name": "test-webhook",
     "headers": {"X-Test": "Hello world!"},
     "version": "1.2",
     "status": "ACTIVE",
@@ -12,6 +17,9 @@ dummy_webhook = {
     "hmac_secret_key": "abcdef",
 }
 
+def test_webhook_verify():
+    is_verified = tenancy.webhooks.verify(webhook_url)
+    assert is_verified
 
 def test_create_webhook():
     """Tests an API call to create a webhook"""
