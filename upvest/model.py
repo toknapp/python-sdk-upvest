@@ -349,6 +349,7 @@ class WebhookInstance:
         self.auth_instance = auth_instance
         self.id = webhook_attr["id"]
         self.url = webhook_attr["url"]
+        self.name = webhook_attr["name"]
         self.hmac_secret_key = webhook_attr["hmac_secret_key"]
         self.headers = webhook_attr["headers"]
         self.version = webhook_attr["version"]
@@ -357,13 +358,20 @@ class WebhookInstance:
 
 
 class Webhooks:
-    def __init__(self, tenancy_auth_instance):
-        self.auth = tenancy_auth_instance
+    def __init__(self, auth_instance):
+        self.auth = auth_instance
         self.path = "/tenancy/webhooks/"
+        self.path_verify = "/tenancy/webhooks-verify/"
 
-    def create(self, url, hmac_secret_key, version, status, event_filters, headers=None):
+    def verify(self, url):
+        body = {"verify_url": url}
+        resp = Response(Request().post(auth_instance=self.auth, path=self.path_verify, body=body))
+        return resp.status_code == 201
+
+    def create(self, url, name, hmac_secret_key, version, status, event_filters, headers=None):
         body = {
             "url": url,
+            "name": name,
             "hmac_secret_key": hmac_secret_key,
             "headers": headers or {},
             "version": version,
@@ -380,18 +388,6 @@ class Webhooks:
     def delete(self, webhook_id):
         response = Response(Request().delete(auth_instance=self.auth, path=f"{self.path}{webhook_id}"))
         return response.status_code == http.HTTPStatus.NO_CONTENT
-
-    def update(self, webhook_id, url, hmac_secret_key, version, status, event_filters, headers=None):
-        body = {
-            "url": url,
-            "headers": headers or {},
-            "version": version,
-            "status": status,
-            "hmac_secret_key": hmac_secret_key,
-            "event_filters": event_filters,
-        }
-        response = Response(Request().patch(auth_instance=self.auth, path=f"{self.path}{webhook_id}", body=body))
-        return response.status_code == http.HTTPStatus.OK
 
     def list(self, count):
         # Retrieve subset of webhooks

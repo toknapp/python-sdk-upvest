@@ -1,16 +1,26 @@
+import os
+
 from .partials.client_instance import create_tenancy_client
 
 tenancy = create_tenancy_client()
 
+webhook_url = os.getenv("WEBHOOK_URL", "")
+webhook_verification_url = os.getenv("WEBHOOK_VERIFICATION_URL", "")
 
 dummy_webhook = {
-    "url": "https://upvest-raphael-flexapp.appspot.com/webhook/platitude--raphael-local-generic--tenant-1",
+    "url": webhook_url,
+    "name": "test-webhook",
     "headers": {"X-Test": "Hello world!"},
     "version": "1.2",
     "status": "ACTIVE",
-    "event_filters": ["wallet.created", "*", "wallet.*"],
+    "event_filters": ["upvest.wallet.created", "ropsten.block.*", "upvest.echo.post"],
     "hmac_secret_key": "abcdef",
 }
+
+
+def test_webhook_verify():
+    is_verified = tenancy.webhooks.verify(webhook_verification_url)
+    assert is_verified
 
 
 def test_create_webhook():
@@ -28,15 +38,11 @@ def test_list_webhooks():
     assert webhook.url == dummy_webhook["url"]
 
 
-def test_update_webhook():
-    """Tests an API call to update a webhook"""
+def test_retrieve_webhook():
     webhooks = tenancy.webhooks.all()
     webhook_id = webhooks[0].id
     webhook = tenancy.webhooks.get(webhook_id)
-    # update and save the webhook
-    webhook2 = dict(webhook, hmac_secret_key="123456")
-    is_updated = tenancy.webhooks.update(webhook_id, **webhook2)
-    assert is_updated
+    assert webhook.url == dummy_webhook["url"]
 
 
 def test_delete_webhook():
@@ -44,10 +50,3 @@ def test_delete_webhook():
     webhook_id = webhooks[0].id
     is_deleted = tenancy.webhooks.delete(webhook_id)
     assert is_deleted
-
-
-def test_retrieve_webhook():
-    webhooks = tenancy.webhooks.all()
-    webhook_id = webhooks[0].id
-    webhook = tenancy.webhooks.get(webhook_id)
-    assert webhook.url == dummy_webhook["url"]
