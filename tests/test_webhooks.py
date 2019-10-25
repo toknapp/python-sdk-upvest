@@ -1,6 +1,9 @@
 import os
+import secrets
 
+from upvest.model import WebhookInstance
 from .partials.client_instance import create_tenancy_client
+
 
 tenancy = create_tenancy_client()
 
@@ -9,7 +12,7 @@ webhook_verification_url = os.getenv("WEBHOOK_VERIFICATION_URL", "")
 
 dummy_webhook = {
     "url": webhook_url,
-    "name": "test-webhook",
+    "name": "test-webhook-{}".format(secrets.token_hex(nbytes=2)),
     "headers": {"X-Test": "Hello world!"},
     "version": "1.2",
     "status": "ACTIVE",
@@ -25,8 +28,8 @@ def test_webhook_verify():
 
 def test_create_webhook():
     """Tests an API call to create a webhook"""
-    is_created = tenancy.webhooks.create(**dummy_webhook)
-    assert is_created
+    webhook = tenancy.webhooks.create(**dummy_webhook)
+    assert isinstance(webhook, WebhookInstance)
 
 
 def test_list_webhooks():

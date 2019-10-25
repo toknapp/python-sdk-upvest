@@ -345,8 +345,7 @@ class Transactions:
 
 
 class WebhookInstance:
-    def __init__(self, auth_instance, **webhook_attr):
-        self.auth_instance = auth_instance
+    def __init__(self, **webhook_attr):
         self.id = webhook_attr["id"]
         self.url = webhook_attr["url"]
         self.name = webhook_attr["name"]
@@ -379,11 +378,11 @@ class Webhooks:
             "event_filters": event_filters,
         }
         response = Response(Request().post(auth_instance=self.auth, path=self.path, body=body))
-        return response.status_code == http.HTTPStatus.CREATED
+        return WebhookInstance(**response.data)
 
     def get(self, webhook_id):
         response = Response(Request().get(auth_instance=self.auth, path=f"{self.path}{webhook_id}"))
-        return WebhookInstance(self.auth, **response.data)
+        return WebhookInstance(**response.data)
 
     def delete(self, webhook_id):
         response = Response(Request().delete(auth_instance=self.auth, path=f"{self.path}{webhook_id}"))
@@ -399,7 +398,7 @@ class Webhooks:
         while listed_count < count:
             response = Response(Request().get(auth_instance=self.auth, path=path))
             for webhook in response.data:
-                array_of_webhooks.append(WebhookInstance(self.auth, **webhook))
+                array_of_webhooks.append(WebhookInstance(**webhook))
                 listed_count += 1
                 if listed_count >= count:
                     break
@@ -424,7 +423,7 @@ class Webhooks:
         while True:
             response = Response(Request().get(auth_instance=self.auth, path=path))
             for webhook in response.data:
-                array_of_webhooks.append(WebhookInstance(self.auth, **webhook))
+                array_of_webhooks.append(WebhookInstance(**webhook))
             if response.raw.json()["next"]:
                 path = response.raw.json()["next"].split(API_VERSION)[-1]
                 path_parts = list(urlsplit(path))
