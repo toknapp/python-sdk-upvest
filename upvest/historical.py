@@ -33,7 +33,7 @@ HDTransaction = namedtuple(
         "blockNumber",
         # replace "from" with "sender" to suppress Python error on keyword
         "sender",
-        "gas",
+        "gasLimit",
         "hash",
         "nonce",
         "transactionIndex",
