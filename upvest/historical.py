@@ -1,5 +1,25 @@
 """Historical data objects"""
-from collections import namedtuple
+import collections
+
+
+def namedtuple(typename, field_names):
+    """
+    Creates a namedtuple object that silently ignores unknown keys.
+
+    This ensures compatibility with changing API.
+    """
+    base = collections.namedtuple("Base", field_names)
+    return type(
+        typename,
+        (base,),
+        {
+            "__slots__": (),
+            "__new__": lambda cls, *args, **kwargs: base.__new__(
+                cls, *args, **{k: v for k, v in kwargs.items() if k in base._fields}
+            ),
+        },
+    )
+
 
 HDBlock = namedtuple(
     "HDBlock",
@@ -42,6 +62,7 @@ HDTransaction = namedtuple(
         "gasPrice",
         "input",
         "confirmations",
+        "error",
     ],
 )
 
