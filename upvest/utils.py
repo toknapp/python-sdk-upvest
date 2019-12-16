@@ -39,7 +39,7 @@ class Request:
         else:
             raise ValueError("no valid JSON structure given")
 
-    def _request(self, auth_instance, method, path, body=None):
+    def _request(self, auth_instance, method, path, body=None, params=None):
         if body is not None:
             self._check(body)
             body = json.dumps(body)
@@ -48,7 +48,7 @@ class Request:
         authenticated_headers["User-Agent"] = auth_instance.user_agent
         # Execute request with authenticated headers
         request_url = urljoin(auth_instance.base_url, API_VERSION + path)
-        response = requests.request(method, request_url, data=body, headers=authenticated_headers)
+        response = requests.request(method, request_url, data=body, params=params, headers=authenticated_headers)
         if response.status_code >= 300:
             raise InvalidRequest(response)
         else:

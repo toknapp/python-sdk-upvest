@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from upvest.config import API_VERSION
 from upvest.utils import Request, Response
+from upvest.historical import HDTransaction, HDTransactions, HDBlock, HDBalance, HDStatus
 
 
 # Endpoint related objects
@@ -434,3 +435,62 @@ class Webhooks:
             else:
                 break
         return array_of_webhooks
+
+
+class HistoricalData:
+    def __init__(self, auth_instance):
+        self.auth = auth_instance
+        self.path = "/data"
+
+    def get_transactions(self, protocol, network, address, filters=None):
+        """List transactions that have been sent to and received by an address"""
+        filters = filters if filters else {}
+        response = Response(
+            Request().get(
+                auth_instance=self.auth, path=f"{self.path}/{protocol}/{network}/transactions/{address}", params=filters
+            )
+        )
+        data = response.data
+        txs = []
+        for tx in response.data["result"]:
+            tx["sender"] = tx.pop("from")
+            txs.append(HDTransaction(**tx))
+
+        return HDTransactions(result=txs, next_cursor=data["next_cursor"])
+
+    def get_transaction(self, protocol, network, txhash):
+        """Retrieve transaction (single) by txhash"""
+        response = Response(
+            Request().get(auth_instance=self.auth, path=f"{self.path}/{protocol}/{network}/transaction/{txhash}")
+        )
+        tx = response.data["result"]
+        tx["sender"] = tx.pop("from")
+        return HDTransaction(**tx)
+
+    def get_block(self, protocol, network, block_number):
+        """Retrieve block details by blockNumber"""
+        response = Response(
+            Request().get(auth_instance=self.auth, path=f"{self.path}/{protocol}/{network}/block/{block_number}")
+        )
+        return HDBlock(**response.data["result"])
+
+    def get_asset_balance(self, protocol, network, address):
+        """Retrieve native asset balance by address"""
+        response = Response(
+            Request().get(auth_instance=self.auth, path=f"{self.path}/{protocol}/{network}/balance/{address}")
+        )
+        return HDBalance(**dict(**response.data["result"], contract=None))
+
+    def get_contract_balance(self, protocol, network, address, contract_address):
+        """Retrieve contract asset balance by address"""
+        response = Response(
+            Request().get(
+                auth_instance=self.auth, path=f"{self.path}/{protocol}/{network}/balance/{address}/{contract_address}"
+            )
+        )
+        return HDBalance(**response.data["result"])
+
+    def get_api_status(self, protocol, network):
+        """Returns the historical data API status"""
+        response = Response(Request().get(auth_instance=self.auth, path=f"{self.path}/{protocol}/{network}/status"))
+        return HDStatus(**response.data["result"])

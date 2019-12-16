@@ -3,7 +3,7 @@ import base64
 from upvest.authentication import KeyAuth
 from upvest.config import UPVEST_API_TARGET
 from upvest.exceptions import RecoveryFailedError
-from upvest.model import Assets, Users, Webhooks
+from upvest.model import Assets, Users, Webhooks, HistoricalData
 from upvest.utils import Request, Response, verify_echo
 
 
@@ -20,6 +20,7 @@ class UpvestTenancyAPI:
         self.users = Users(self.auth_instance)
         self.assets = Assets(self.auth_instance)
         self.webhooks = Webhooks(self.auth_instance)
+        self.historical = HistoricalData(self.auth_instance)
 
     def check_auth(self):
         verify_echo(self.auth_instance, "/tenancy/echo-signed")
