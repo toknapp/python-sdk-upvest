@@ -1,8 +1,8 @@
 import hashlib
-import ethereum.utils
 import bitcoin
 import pytest
 import sha3
+from web3 import Web3
 from py_ecc.secp256k1 import ecdsa_raw_recover
 from . import fresh
 from .partials.client_instance import create_oauth_client
@@ -13,6 +13,11 @@ from upvest.exceptions import AuthenticationError
 
 ETHEREUM_ROPSTEN_ASSET_ID = "deaaa6bf-d944-57fa-8ec4-2dd45d1f5d3f"
 BITCOIN_TESTNET_ASSET_ID = "a3c18f74-935e-5d75-bd3c-ce0fb5464414"
+
+
+def pubkey_to_ethereum_address(pk) -> str:
+    address_bytes = sha3.keccak_256(pk.x.to_bytes(32, "big") + pk.y.to_bytes(32, "big")).digest()
+    return Web3.toChecksumAddress(address_bytes[-20:])
 
 
 def test_echo():
@@ -77,11 +82,6 @@ def test_list_assets():
     assert assets[0].symbol == "AR"
     assert assets[0].exponent == 12
     assert assets[0].protocol == "arweave_testnet"
-
-
-def pubkey_to_ethereum_address(pk):
-    kec = sha3.keccak_256(pk.x.to_bytes(32, "big") + pk.y.to_bytes(32, "big")).digest()
-    return ethereum.utils.checksum_encode(kec[-20:])
 
 
 def pubkey_to_bitcoin_address(pk, prefix):

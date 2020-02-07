@@ -257,14 +257,14 @@ class Wallets:
 class TransactionInstance:
     def __init__(self, **transaction_attr):
         self.path = "/kms/wallets/"
-        self.id = transaction_attr["id"]
-        self.txhash = transaction_attr["txhash"]
-        self.sender = transaction_attr["sender"]
-        self.recipient = transaction_attr["recipient"]
-        self.asset_id = transaction_attr["asset_id"]
-        self.quantity = int(transaction_attr["quantity"])
-        self.fee = int(transaction_attr["fee"])
-        self.status = transaction_attr["status"]
+        self.id = transaction_attr.get("id")
+        self.txhash = transaction_attr.get("txhash")
+        self.sender = transaction_attr.get("sender")
+        self.recipient = transaction_attr.get("recipient")
+        self.asset_id = transaction_attr.get("asset_id")
+        self.quantity = int(transaction_attr.get("quantity")) if transaction_attr.get("quantity") is not None else None
+        self.fee = int(transaction_attr.get("fee")) if transaction_attr.get("fee") is not None else None
+        self.status = transaction_attr.get("status")
 
 
 class Transactions:
@@ -273,15 +273,19 @@ class Transactions:
         self.auth_instance = auth_instance
         self.wallet_id = wallet_id
 
-    def create(self, password, asset_id, quantity, fee, recipient):
+    def create(self, password, asset_id, quantity, fee, recipient, asynchronous=None, fund=None):
         # Provide password and asset_id for wallet creation
+        asynchronous = asynchronous if asynchronous is not None else True
         body = {
             "password": password,
             "asset_id": asset_id,
             "quantity": str(quantity),
             "fee": str(fee),
             "recipient": recipient,
+            "async": asynchronous,
         }
+        if fund is not None:
+            body["fund"] = fund
         response = Response(
             Request().post(
                 auth_instance=self.auth_instance, path=f"{self.path}{self.wallet_id}/transactions/", body=body
