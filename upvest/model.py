@@ -275,7 +275,7 @@ class Transactions:
 
     def create(self, password, asset_id, quantity, fee, recipient, asynchronous=None, fund=None):
         # Provide password and asset_id for wallet creation
-        asynchronous = asynchronous if asynchronous is not None else True
+        asynchronous = asynchronous if asynchronous is not None else False
         body = {
             "password": password,
             "asset_id": asset_id,
