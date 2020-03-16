@@ -257,10 +257,11 @@ class Wallets:
 class TransactionInstance:
     def __init__(self, **transaction_attr):
         self.path = "/kms/wallets/"
-        self.id = transaction_attr.get("id")
-        self.txhash = transaction_attr.get("txhash")
-        self.sender = transaction_attr.get("sender")
+        self.id = transaction_attr["id"]
+        self.txhash = transaction_attr["txhash"]
+        self.sender = transaction_attr["sender"]
         self.recipient = transaction_attr.get("recipient")
+        # these fields are not present in raw and complex transactions
         self.asset_id = transaction_attr.get("asset_id")
         self.quantity = int(transaction_attr.get("quantity")) if transaction_attr.get("quantity") is not None else None
         self.fee = int(transaction_attr.get("fee")) if transaction_attr.get("fee") is not None else None
@@ -347,6 +348,24 @@ class Transactions:
             else:
                 break
         return array_of_transactions
+
+    def create_complex(self, wallet_id, password, tx, fund=True):
+        """
+        Sign and broadcast complex transaction
+        """
+        path = f"{self.path}{wallet_id}/transactions/complex"
+        body = {"password": password, "fund": fund, "tx": tx}
+        response = Response(Request().post(auth_instance=self.auth_instance, path=path, body=body))
+        return TransactionInstance(**response.data)
+
+    def create_raw(self, wallet_id, password, raw_tx, input_format="base64", fund=True):
+        """
+        Sign a raw transaction and broadcast it to the blockchain.
+        """
+        path = f"{self.path}{wallet_id}/transactions/raw"
+        body = {"password": password, "raw_tx": raw_tx, "input_format": input_format, "fund": fund}
+        response = Response(Request().post(auth_instance=self.auth_instance, path=path, body=body))
+        return TransactionInstance(**response.data)
 
 
 class WebhookInstance:

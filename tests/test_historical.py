@@ -6,7 +6,7 @@ ETH_ROPSTEN_NETWORK = "ropsten"
 tenancy = create_tenancy_client()
 
 
-def test_get_transactions_by_txhash():
+def test_get_transaction_by_txhash():
     txhash = "0xa313aaad0b9b1fd356f7f42ccff1fa385a2f7c2585e0cf1e0fb6814d8bdb559a"
     tx = tenancy.historical.get_transaction(ETH_PROTOCOL, ETH_ROPSTEN_NETWORK, txhash)
     assert tx.hash == txhash[2:]
