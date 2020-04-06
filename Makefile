@@ -1,4 +1,4 @@
-.PHONY: help clean clean-pyc clean-build lint test coverage publish fmt
+.PHONY: help clean clean-pyc clean-build lint test coverage publish fmt docs
 
 help:
 	@echo "clean - remove build and Python file artifacts"
@@ -44,3 +44,11 @@ publish: clean test
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
 	rm -fr build dist .egg requests.egg-info
+
+docs:
+	@echo "==> Building documentaion"
+	@cd docs/; make html
+
+clean-docs:
+	@echo "==> Cleaning documentaion"
+	@cd docs/; make clean

@@ -30,6 +30,11 @@ class UserInstance:
         return UserInstance(response, username)
 
     def delete(self):
+        """
+        Delete a user
+
+        tenancy.users.get('username').delete()
+        """
         response = Response(
             Request().delete(auth_instance=self.auth_instance, path=self.path + self.username, body=None)
         )
@@ -45,6 +50,11 @@ class Users:
         self.auth_instance = auth_instance
 
     def create(self, username, password, raw_recovery_kit=False, asset_ids=None):
+        """
+        Create a user
+
+        user = tenancy.users.create('username','password')
+        """
         # Set username and password for the user
         body = {"username": username, "password": password, "raw": raw_recovery_kit, "asset_ids": asset_ids or []}
         response = Response(Request().post(auth_instance=self.auth_instance, path=self.path, body=body))
@@ -53,11 +63,21 @@ class Users:
         return UserInstance(self.auth_instance, username, recovery_kit=recovery_kit)
 
     def get(self, username):
+        """
+        Retrieve a user
+
+        user = tenancy.users.get('username')
+        """
         response = Response(Request().get(auth_instance=self.auth_instance, path=self.path + username))
         username = response.data["username"]
         return UserInstance(self.auth_instance, username, wallets=response.data["wallets"])
 
     def list(self, count):
+        """
+        List a specific number of users under tenancy
+
+        users = tenancy.users.list(10)
+        """
         # Retrieve subset of users
         MAX_PAGE_SIZE = 100
         array_of_users = []
@@ -84,6 +104,11 @@ class Users:
         return array_of_users
 
     def all(self):
+        """
+        List all users under tenancy
+
+        users = tenancy.users.all()
+        """
         MAX_PAGE_SIZE = 100
         array_of_users = []
         path = "/tenancy/users/?{MAX_PAGE_SIZE}"
@@ -120,6 +145,11 @@ class Assets:
         self.auth_instance = auth_instance
 
     def all(self):
+        """
+        List available assets
+
+        assets = clientele.assets.all()
+        """
         MAX_PAGE_SIZE = 100
         array_of_assets = []
         path = "/assets/?{MAX_PAGE_SIZE}"
@@ -195,6 +225,11 @@ class Wallets:
         self.auth_instance = auth_instance
 
     def create(self, asset_id, password):
+        """
+        Create a wallet for a user
+
+        wallet = clientele.wallets.create('asset_id', 'password')
+        """
         # Get desired asset id from assets list
         # Provide password and asset_id for wallet creation
         body = {"password": password, "asset_id": asset_id}
@@ -202,12 +237,21 @@ class Wallets:
         return WalletInstance(self.auth_instance, **response.data)
 
     def get(self, wallet_id):
+        """
+        Retrieve specific wallet for a user
+
+        wallet = clientele.wallets.get('wallet_id')
+        """
         # Retrieve specific wallet for a user
         response = Response(Request().get(auth_instance=self.auth_instance, path=self.path + wallet_id))
         return WalletInstance(self.auth_instance, **response.data)
 
     def list(self, count):
-        # Retrieve subset of wallets
+        """
+        List a specific number of wallets
+
+        wallets = clientele.wallets.list(40)
+        """
         MAX_PAGE_SIZE = 100
         array_of_wallets = []
         path = f"/kms/wallets/?page_size={MAX_PAGE_SIZE}"
@@ -233,6 +277,11 @@ class Wallets:
         return array_of_wallets
 
     def all(self):
+        """
+        List all wallets for a user
+
+        wallets = clientele.wallets.all()
+        """
         # Retrieve subset of wallets
         MAX_PAGE_SIZE = 100
         array_of_wallets = []
@@ -275,6 +324,12 @@ class Transactions:
         self.wallet_id = wallet_id
 
     def create(self, password, asset_id, quantity, fee, recipient, asynchronous=None, fund=None):
+        """
+        Create transaction
+
+        wallet = clientele.wallets.create('asset_id','password')
+        transaction = wallet.transactions.create('password', 'asset_id', 'quantity', 'fee', 'recipient')
+        """
         # Provide password and asset_id for wallet creation
         asynchronous = asynchronous if asynchronous is not None else False
         body = {
@@ -295,6 +350,13 @@ class Transactions:
         return TransactionInstance(**response.data)
 
     def get(self, transaction_id):
+        """
+        Retrieve specific transaction
+
+        wallet = clientele.wallets.create('asset_id','password')
+        id = wallet.transactions.all()[i].id
+        transaction = wallet.transactions.get(id)
+        """
         # Define tx endpoint
         response = Response(
             Request().get(
@@ -304,6 +366,10 @@ class Transactions:
         return TransactionInstance(**response.data)
 
     def list(self, count):
+        """
+        wallet = clientele.wallets.create('asset_id','password')
+        transactions = wallet.transactions.list(8)
+        """
         # Retrieve subset of wallets
         MAX_PAGE_SIZE = 100
         array_of_transactions = []
@@ -330,6 +396,12 @@ class Transactions:
         return array_of_transactions
 
     def all(self):
+        """
+        List all transactions of a wallet for a user
+
+        wallet = clientele.wallets.create('asset_id','password')
+        transactions = wallet.transactions.all()
+        """
         MAX_PAGE_SIZE = 100
         array_of_transactions = []
         path = f"{self.path}{self.wallet_id}/transactions/?page_size={MAX_PAGE_SIZE}"

@@ -8,6 +8,15 @@ from upvest.utils import Request, Response, verify_echo
 
 
 class UpvestTenancyAPI:
+    """
+    All tenancy related operations must be authenticated using the API Keys Authentication,
+    whereas all actions on a user's behalf need to be authenticated via OAuth.
+
+    The API calls are built along with those two authentication objects.
+    The methods allow for passing parameters if needed.
+    If the required arguments are not provided, a respective error will be raised.
+    """
+
     def __init__(self, api_key, api_secret, api_passphrase, base_url=None, user_agent=None):
         base_url = base_url or UPVEST_API_TARGET
         self.auth_instance = KeyAuth(

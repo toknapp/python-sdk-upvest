@@ -11,6 +11,21 @@ from upvest.exceptions import InvalidRequest
 
 
 class KeyAuth:
+    """
+    ### API Keys Authentication
+    The Upvest API uses the notion of _tenants_, which represent customers that build their platform upon the Upvest API. The end-users of the tenant (i.e. your customers), are referred to as _clients_. A tenant is able to manage their users directly (CRUD operations for the user instance) and is also able to initiate actions on the user's behalf (create wallets, send transactions).
+
+    The authentication via API keys and secret allows you to perform all tenant related operations.
+    Please create an API key pair within the [Upvest account management](https://login.upvest.co/).
+
+    The default `BASE_URL` for both authentication objects is `https://api.playground.upvest.co`, but feel free to adjust it, once you retrieve your live keys.
+    Next, create an `UpvestTenancyAPI` object in order to authenticate your API calls:
+    ```python
+    from upvest.tenancy import UpvestTenancyAPI
+    tenancy = UpvestTenancyAPI(API_KEY, API_SECRET, API_PASSPHRASE, base_url=BASE_URL) # or base_url=None to use the playground environment (default)
+    ```
+    """
+
     def __init__(self, api_key=None, api_secret=None, api_passphrase=None, base_url=None, user_agent=None):
         self.api_key = api_key
         self.api_secret = api_secret
@@ -39,6 +54,19 @@ class KeyAuth:
 
 
 class OAuth:
+    """
+    ### OAuth Authentication
+    The authentication via OAuth allows you to perform operations on behalf of your user.
+    For more information on the OAuth concept, please refer to our [documentation](https://doc.upvest.co/docs/oauth2-authentication).
+    Again, please retrieve your client credentials from the [Upvest account management](https://login.upvest.co/).
+
+    Next, create an `UpvestClienteleAPI` object with these credentials and your user authentication data in order to authenticate your API calls on behalf of a user:
+    ```python
+    from upvest.clientele import UpvestClienteleAPI
+    clientele = UpvestClienteleAPI(CLIENT_ID, CLIENT_SECRET, username, password, base_url=BASE_URL) # or base_url=None to use the playground environment (default)
+    ```
+    """
+
     def __init__(
         self, client_id=None, client_secret=None, username=None, password=None, base_url=None, user_agent=None
     ):

@@ -8,6 +8,12 @@ from upvest.exceptions import InvalidRequest, AuthenticationError
 
 
 class Response:
+    """
+    The response objects are designed around users, wallets, transactions and assets.
+    If you retrieve more than one object (for example: `tenancy.users.all()`) a list
+    of those objects will be returned.
+    """
+
     def __init__(self, result):
         self.status_code = result.status_code
         self.raw = result
